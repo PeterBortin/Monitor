@@ -257,36 +257,48 @@
   #ui-tl{position:absolute;left:50%;transform:translateX(-50%);bottom:calc(18px + var(--sb));z-index:19;width:min(440px,64vw);background:var(--cream);border-radius:16px;box-shadow:var(--uish);padding:8px 14px;display:none}
   #ui-tl.show{display:block}
   #ui-tl .tlhead{color:var(--ink2)}#ui-tl #tl-now{color:var(--olive2)}
-  .pop{position:absolute;z-index:22;background:var(--cream);border-radius:18px;box-shadow:0 16px 44px rgba(0,0,0,.42);padding:14px;width:250px;max-height:66vh;overflow-y:auto;display:none;-webkit-overflow-scrolling:touch}
-  .pop.show{display:block}
-  .pop h4{font-size:11px;letter-spacing:.14em;text-transform:uppercase;color:var(--ink2);font-weight:800;margin-bottom:10px}
-  .pop .it{display:flex;justify-content:space-between;align-items:center;gap:10px;padding:11px 12px;border-radius:11px;background:var(--cream2);margin-bottom:7px;cursor:pointer;color:var(--ink);font-weight:600;font-size:13px}
-  .pop .it:active{transform:scale(.98)}
-  .pop .it.on{background:var(--olive);color:#fff}
-  .pop .it small{color:var(--ink2);font-weight:600}.pop .it.on small{color:rgba(255,255,255,.85)}
-  .pop .row{display:flex;gap:8px;margin-top:8px}
-  .pop .row button{flex:1;height:42px;border-radius:11px;border:none;background:var(--fab);color:var(--cream);font-family:inherit;font-weight:700;font-size:12px;cursor:pointer}
-  .pop .row button.alt{background:var(--cream2);color:var(--ink)}
-  .pop input{width:100%;background:var(--cream2);border:none;border-radius:11px;padding:11px 12px;font-family:inherit;font-size:14px;color:var(--ink);outline:none;margin-bottom:8px;-webkit-user-select:text}
-  .pop .seg{display:flex;gap:6px;margin-bottom:8px;flex-wrap:wrap}
-  .pop .seg button{flex:1 1 40px;height:38px;border-radius:10px;border:none;background:var(--cream2);color:var(--ink);font-family:inherit;font-weight:700;font-size:11px;cursor:pointer}
-  .pop .seg button.on{background:var(--olive);color:#fff}
-  .pop .chip{display:inline-flex;align-items:center;gap:6px;padding:8px 12px;border-radius:999px;background:var(--cream2);color:var(--ink);font-weight:600;font-size:12px;cursor:pointer;margin:0 6px 6px 0}
-  .pop .chip.on{background:var(--olive);color:#fff}
-  .pop .note{font-size:11px;color:var(--ink2);line-height:1.55}
-  .pop .arm{font-size:11px;color:var(--olive2);font-weight:700;margin-top:8px;min-height:14px}
+  #sheet-back{position:fixed;inset:0;background:rgba(20,18,15,.4);z-index:30;opacity:0;pointer-events:none;transition:opacity .25s}
+  #sheet-back.show{opacity:1;pointer-events:auto}
+  .sheet{position:fixed;left:0;right:0;bottom:0;z-index:31;background:var(--cream);border-radius:22px 22px 0 0;box-shadow:0 -12px 40px rgba(0,0,0,.42);transform:translateY(115%);transition:transform .32s var(--ease);padding:0 18px calc(16px + var(--sb));max-height:82vh;display:flex;flex-direction:column;width:auto}
+  .sheet.show{transform:translateY(0)}
+  .sheet::before{content:"";position:absolute;top:8px;left:50%;transform:translateX(-50%);width:38px;height:4px;border-radius:2px;background:var(--cream2)}
+  .sheet-h{display:flex;align-items:center;justify-content:space-between;padding:20px 0 12px;flex:0 0 auto}
+  .sheet-h h4{font-size:12px;letter-spacing:.14em;text-transform:uppercase;color:var(--ink2);font-weight:800}
+  .sheet-x{width:34px;height:34px;border-radius:50%;background:var(--cream2);border:none;color:var(--ink);display:flex;align-items:center;justify-content:center;cursor:pointer;padding:0;flex:0 0 auto}
+  .sheet-x svg{width:18px;height:18px;stroke:currentColor;stroke-width:2;fill:none;stroke-linecap:round;stroke-linejoin:round}
+  .sheet-body{overflow-y:auto;-webkit-overflow-scrolling:touch;padding-bottom:6px;flex:1 1 auto;min-height:0}
+  #sheet-time .tlhead{color:var(--ink2)}#sheet-time #tl-now{color:var(--olive2)}
+  .sheet .it{display:flex;justify-content:space-between;align-items:center;gap:10px;padding:12px 13px;border-radius:12px;background:var(--cream2);margin-bottom:8px;cursor:pointer;color:var(--ink);font-weight:600;font-size:14px}
+  .sheet .it:active{transform:scale(.99)}
+  .sheet .it.on{background:var(--olive);color:#fff}
+  .sheet .it small{color:var(--ink2);font-weight:600}.sheet .it.on small{color:rgba(255,255,255,.85)}
+  .sheet .row{display:flex;gap:8px;margin-top:8px}
+  .sheet .row button{flex:1;height:46px;border-radius:12px;border:none;background:var(--fab);color:var(--cream);font-family:inherit;font-weight:700;font-size:13px;cursor:pointer}
+  .sheet .row button.alt{background:var(--cream2);color:var(--ink)}
+  .sheet input{width:100%;background:var(--cream2);border:none;border-radius:12px;padding:13px;font-family:inherit;font-size:15px;color:var(--ink);outline:none;margin-bottom:9px;-webkit-user-select:text}
+  .sheet .seg{display:flex;gap:6px;margin-bottom:9px;flex-wrap:wrap}
+  .sheet .seg button{flex:1 1 60px;height:40px;border-radius:11px;border:none;background:var(--cream2);color:var(--ink);font-family:inherit;font-weight:700;font-size:12px;cursor:pointer}
+  .sheet .seg button.on{background:var(--olive);color:#fff}
+  .sheet .chip{display:inline-flex;align-items:center;gap:6px;padding:9px 13px;border-radius:999px;background:var(--cream2);color:var(--ink);font-weight:600;font-size:13px;cursor:pointer;margin:0 7px 7px 0}
+  .sheet .chip.on{background:var(--olive);color:#fff}
+  .sheet .note{font-size:12px;color:var(--ink2);line-height:1.55;padding-bottom:4px}
+  .sheet .arm{font-size:12px;color:var(--olive2);font-weight:700;margin:2px 0 4px;min-height:15px}
   /* reused elements themed cream */
-  #card{background:var(--cream)!important;border:none!important;color:var(--ink)!important;border-radius:18px!important;box-shadow:var(--uish)!important;left:88px!important;right:auto!important;top:calc(16px + var(--st))!important;bottom:auto!important;width:238px!important}
+  #card{position:fixed!important;left:0!important;right:0!important;bottom:0!important;top:auto!important;width:auto!important;max-width:none!important;background:var(--cream)!important;border:none!important;color:var(--ink)!important;border-radius:22px 22px 0 0!important;box-shadow:0 -12px 40px rgba(0,0,0,.42)!important;transform:translateY(115%)!important;transition:transform .32s var(--ease)!important;padding:22px 18px calc(18px + var(--sb))!important;z-index:31!important}
+  #card.show{transform:translateY(0)!important}
   #card .ct{color:var(--ink)!important}
   #card .cx{color:var(--ink2)!important}
   #card .cdesc{color:var(--ink2)!important}
   #card .crow span{color:var(--ink2)!important}#card .crow b{color:var(--ink)!important}
-  #report .rcard{background:var(--cream)!important;border:none!important;color:var(--ink)!important;box-shadow:0 16px 44px rgba(0,0,0,.5)!important}
+  #report{align-items:flex-end!important;background:rgba(20,18,15,.42)!important}
+  #report .rcard{position:relative!important;background:var(--cream)!important;border:none!important;color:var(--ink)!important;border-radius:22px 22px 0 0!important;width:100%!important;max-width:none!important;box-shadow:0 -12px 40px rgba(0,0,0,.5)!important;padding-top:36px!important;transform:translateY(115%);transition:transform .32s var(--ease)}
+  #report.show .rcard{transform:translateY(0)}
   #report .rcard h3{color:var(--ink)!important}
   #report .rcard .k{color:var(--ink2)!important}
   #report .rbtns button{background:var(--cream2)!important;color:var(--ink)!important;border:none!important}
   #report .rbtns button.pri{background:var(--olive)!important;color:#fff!important}
-  #panelLR{background:var(--cream)!important;border:none!important;box-shadow:var(--uish)!important;right:88px!important;left:auto!important;top:calc(16px + var(--st))!important;width:272px!important;color:var(--ink)!important}
+  #panelLR{position:fixed!important;left:0!important;right:0!important;bottom:0!important;top:auto!important;width:auto!important;background:var(--cream)!important;border:none!important;box-shadow:0 -12px 40px rgba(0,0,0,.42)!important;color:var(--ink)!important;border-radius:22px 22px 0 0!important;transform:translateY(115%)!important;transition:transform .32s var(--ease)!important;max-height:80vh!important;z-index:31!important;padding-top:10px!important}
+  #panelLR.show{transform:translateY(0)!important}
   #panelLR .ph{color:var(--ink2)!important}
   #panelLR .phx{background:var(--cream2)!important;border:none!important;color:var(--ink)!important}
   #panelLR .jsearch{background:var(--cream2)!important;border:none!important;color:var(--ink)!important}
@@ -311,6 +323,10 @@
     <button class="ui-btn" id="u-layers" title="Шари"><svg viewBox="0 0 24 24"><path d="M8 6h13M8 12h13M8 18h13"/><path d="M4 6h.01M4 12h.01M4 18h.01"/></svg></button>
   </div>
   <button class="ui-btn" id="u-info" title="Інфо"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 11v5M12 8h.01"/></svg></button>
+  <div class="ui-grp">
+    <button class="ui-btn" id="u-panel" title="Журнал"><svg viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="16" rx="2"/><path d="M14 4v16M6 9h4M6 13h4"/></svg></button>
+    <button class="ui-btn" id="u-time" title="Таймлайн"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="8" stroke-dasharray="2.6 2.6"/><path d="M12 8v4l3 2"/></svg></button>
+  </div>
 </div>
 
 <div id="ui-scale">
@@ -321,11 +337,6 @@
 
 <div id="ui-right">
   <button class="ui-btn" id="u-search" title="Пошук"><svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><path d="M20 20l-3.6-3.6"/></svg></button>
-  <div class="ui-grp">
-    <button class="ui-btn" id="u-close" title="Закрити / зняти"><svg viewBox="0 0 24 24"><path d="M6 6l12 12M18 6 6 18"/></svg></button>
-    <button class="ui-btn" id="u-panel" title="Журнал"><svg viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="16" rx="2"/><path d="M14 4v16M6 9h4M6 13h4"/></svg></button>
-    <button class="ui-btn" id="u-time" title="Таймлайн"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="8" stroke-dasharray="2.6 2.6"/><path d="M12 8v4l3 2"/></svg></button>
-  </div>
   <div class="ui-grp">
     <button class="ui-btn" id="u-traj" title="Траєкторія цілі"><svg viewBox="0 0 24 24"><circle cx="12" cy="5" r="2"/><circle cx="5" cy="18" r="2"/><circle cx="19" cy="18" r="2"/><path d="M12 7 6.5 16M12 7l5.5 9M7 18h10"/></svg></button>
     <button class="ui-btn" id="u-place" title="Розстановка ППО"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="7"/><path d="M12 2v3M12 19v3M2 12h3M19 12h3M12 12h.01"/></svg></button>
@@ -343,17 +354,27 @@
   <div id="ui-fab" title="Фаза / статус"><span class="tri"></span><span id="u-fab-lbl">Пн</span></div>
 </div>
 
-<div id="ui-tl"></div>
+<div id="sheet-back"></div>
 
-<div class="pop" id="pop-place"><h4>Розстановка ППО</h4><div id="pl-list"></div><div class="arm" id="pl-arm"></div><div class="row"><button class="alt" id="pl-auto">Авто-розгортання</button></div></div>
-<div class="pop" id="pop-traj"><h4>Траєкторія цілі</h4><div id="tj-list"></div><div class="arm" id="tj-arm">Оберіть ціль/зброю</div><div class="row"><button id="tj-ok">Підтвердити</button><button class="alt" id="tj-clear">Очистити</button></div></div>
-<div class="pop" id="pop-draw"><h4>Малювання</h4><div class="seg" id="dw-tools"><button data-t="marker">Маркер</button><button data-t="line">Лінія</button><button data-t="poly">Полігон</button><button data-t="ruler">Лінійка</button></div><div id="dw-colors" style="display:flex;gap:8px;margin-bottom:8px"></div><div class="arm" id="dw-arm">Оберіть інструмент</div><div class="row"><button id="dw-ok">Готово</button><button class="alt" id="dw-reset">Скинути</button></div></div>
-<div class="pop" id="pop-save"><h4>Зберегти обʼєкт</h4><input id="sv-name" placeholder="Назва"><input id="sv-group" placeholder="Група"><input id="sv-note" placeholder="Нотатка"><div class="row"><button id="sv-ok">Зберегти</button><button class="alt" id="sv-cancel">Скасувати</button></div></div>
-<div class="pop" id="pop-drones"><h4>Треки дронів</h4><div class="row" style="margin-top:0"><button id="dr-toggle">Показати</button><button class="alt" id="dr-demo">Демо</button></div><div class="row"><button class="alt" id="dr-load">Завантажити JSON…</button></div><div class="seg" id="dr-mode"><button data-m="current">Поточні</button><button data-m="trail">Слід</button><button class="on" data-m="both">Обидва</button></div><div id="dr-chips"></div><div class="note">Спостережувані треки грають по годиннику прогону. ППО їх не перехоплює.</div></div>
-<div class="pop" id="pop-layers"><h4>Шари</h4><div class="it" data-l="ranges">Радіуси ППО<small id="lg-ranges">✓</small></div><div class="it" data-l="paths">Траєкторії<small id="lg-paths">✓</small></div><div class="it" data-l="labels">Підписи<small id="lg-labels">✓</small></div><div class="it" id="lg-sat">Супутник<small>—</small></div></div>
-<div class="pop" id="pop-search"><h4>Пошук міста</h4><input id="se-input" placeholder="Назва міста…" autocomplete="off"><div id="se-list"></div></div>
-<div class="pop" id="pop-info"><h4>Про застосунок</h4><div class="note">delta⁹ — навчальна пісочниця протиповітряної оборони. Синтетичні, ілюстративні дані. Не реальне відстеження й не системи керування вогнем.</div></div>
-<div class="pop" id="pop-person"><h4>Сценарії</h4><div class="it" id="ps-auto">Авто-розгортання ППО<small>12 міст</small></div><div class="note" style="margin-top:8px">Розставляє типовий ешелон ППО по великих містах для швидкого старту.</div></div>
+<div class="sheet" id="sheet-time"><div class="sheet-h"><h4>Таймлайн</h4><button class="sheet-x" data-close><svg viewBox="0 0 24 24"><path d="M6 6l12 12M18 6 6 18"/></svg></button></div><div class="sheet-body" id="sheet-time-body"></div></div>
+
+<div class="sheet" id="sheet-place"><div class="sheet-h"><h4>Розстановка ППО</h4><button class="sheet-x" data-close><svg viewBox="0 0 24 24"><path d="M6 6l12 12M18 6 6 18"/></svg></button></div><div class="sheet-body"><div id="pl-list"></div><div class="arm" id="pl-arm"></div><div class="row"><button class="alt" id="pl-auto">Авто-розгортання</button></div></div></div>
+
+<div class="sheet" id="sheet-traj"><div class="sheet-h"><h4>Траєкторія цілі</h4><button class="sheet-x" data-close><svg viewBox="0 0 24 24"><path d="M6 6l12 12M18 6 6 18"/></svg></button></div><div class="sheet-body"><div id="tj-list"></div><div class="arm" id="tj-arm">Оберіть ціль/зброю</div><div class="row"><button id="tj-ok">Підтвердити</button><button class="alt" id="tj-clear">Очистити</button></div></div></div>
+
+<div class="sheet" id="sheet-draw"><div class="sheet-h"><h4>Малювання</h4><button class="sheet-x" data-close><svg viewBox="0 0 24 24"><path d="M6 6l12 12M18 6 6 18"/></svg></button></div><div class="sheet-body"><div class="seg" id="dw-tools"><button data-t="marker">Маркер</button><button data-t="line">Лінія</button><button data-t="poly">Полігон</button><button data-t="ruler">Лінійка</button></div><div id="dw-colors" style="display:flex;gap:8px;margin-bottom:9px"></div><div class="arm" id="dw-arm">Оберіть інструмент</div><div class="row"><button id="dw-ok">Готово</button><button class="alt" id="dw-reset">Скинути</button></div></div></div>
+
+<div class="sheet" id="sheet-save"><div class="sheet-h"><h4>Зберегти обʼєкт</h4><button class="sheet-x" data-close><svg viewBox="0 0 24 24"><path d="M6 6l12 12M18 6 6 18"/></svg></button></div><div class="sheet-body"><input id="sv-name" placeholder="Назва"><input id="sv-group" placeholder="Група"><input id="sv-note" placeholder="Нотатка"><div class="row"><button id="sv-ok">Зберегти</button><button class="alt" id="sv-cancel">Скасувати</button></div></div></div>
+
+<div class="sheet" id="sheet-drones"><div class="sheet-h"><h4>Треки дронів</h4><button class="sheet-x" data-close><svg viewBox="0 0 24 24"><path d="M6 6l12 12M18 6 6 18"/></svg></button></div><div class="sheet-body"><div class="row" style="margin-top:0"><button id="dr-toggle">Показати</button><button class="alt" id="dr-demo">Демо</button></div><div class="row"><button class="alt" id="dr-load">Завантажити JSON…</button></div><div class="seg" id="dr-mode"><button data-m="current">Поточні</button><button data-m="trail">Слід</button><button class="on" data-m="both">Обидва</button></div><div id="dr-chips"></div><div class="note">Спостережувані треки грають по годиннику прогону. ППО їх не перехоплює.</div></div></div>
+
+<div class="sheet" id="sheet-layers"><div class="sheet-h"><h4>Шари</h4><button class="sheet-x" data-close><svg viewBox="0 0 24 24"><path d="M6 6l12 12M18 6 6 18"/></svg></button></div><div class="sheet-body"><div class="it" data-l="ranges">Радіуси ППО<small id="lg-ranges">✓</small></div><div class="it" data-l="paths">Траєкторії<small id="lg-paths">✓</small></div><div class="it" data-l="labels">Підписи<small id="lg-labels">✓</small></div><div class="it" id="lg-sat">Супутник<small>—</small></div></div></div>
+
+<div class="sheet" id="sheet-search"><div class="sheet-h"><h4>Пошук міста</h4><button class="sheet-x" data-close><svg viewBox="0 0 24 24"><path d="M6 6l12 12M18 6 6 18"/></svg></button></div><div class="sheet-body"><input id="se-input" placeholder="Назва міста…" autocomplete="off"><div id="se-list"></div></div></div>
+
+<div class="sheet" id="sheet-info"><div class="sheet-h"><h4>Про застосунок</h4><button class="sheet-x" data-close><svg viewBox="0 0 24 24"><path d="M6 6l12 12M18 6 6 18"/></svg></button></div><div class="sheet-body"><div class="note">delta⁹ — навчальна пісочниця протиповітряної оборони. Синтетичні, ілюстративні дані. Не реальне відстеження й не системи керування вогнем.</div></div></div>
+
+<div class="sheet" id="sheet-person"><div class="sheet-h"><h4>Сценарії</h4><button class="sheet-x" data-close><svg viewBox="0 0 24 24"><path d="M6 6l12 12M18 6 6 18"/></svg></button></div><div class="sheet-body"><div class="it" id="ps-auto">Авто-розгортання ППО<small>12 міст</small></div><div class="note" style="margin-top:8px">Розставляє типовий ешелон ППО по великих містах для швидкого старту.</div></div></div>
 
 <div id="hud">
   <div class="hrow">
@@ -426,7 +447,7 @@
   <button class="jexp" id="jour-exp">⭳ Експорт PDF</button>
 </div>
 
-<div id="report"><div class="rcard">
+<div id="report"><div class="rcard"><button class="sheet-x" id="rep-x" style="position:absolute;top:16px;right:16px;z-index:2"><svg viewBox="0 0 24 24"><path d="M6 6l12 12M18 6 6 18"/></svg></button>
   <h3>Підсумок прогону · After-action</h3>
   <div class="rbig">
     <div class="rb"><div class="v" id="r-int" style="color:var(--int)">0</div><div class="k">Збито</div></div>
@@ -1106,76 +1127,81 @@ if(document.fonts&&document.fonts.ready)document.fonts.ready.then(()=>render());
    Шар подання: керує рушієм delta⁹ через його глобалі + window.MOD. */
 (function(){
   const $=id=>document.getElementById(id);
-  const tl=$("tlbar");if(tl)$("ui-tl").appendChild(tl);
+  const tl=$("tlbar");if(tl)$("sheet-time-body").appendChild(tl);
 
-  function positionPop(pop,btn,side){const r=btn.getBoundingClientRect();
-    const top=Math.max(16,Math.min(r.top,window.innerHeight-pop.offsetHeight-16));
-    pop.style.top=top+"px";if(side==="left"){pop.style.left="86px";pop.style.right="auto";}else{pop.style.right="86px";pop.style.left="auto";}}
-  function closeAllPops(){document.querySelectorAll(".pop").forEach(p=>p.classList.remove("show"));}
-  function togglePop(id,btn,side,onOpen){const pop=$(id),open=!pop.classList.contains("show");closeAllPops();if(open){if(onOpen)onOpen();pop.classList.add("show");positionPop(pop,btn,side);}}
-  function openPopAt(id,btn,side){closeAllPops();const pop=$(id);pop.classList.add("show");positionPop(pop,btn,side);}
-  function closePop(id){$(id).classList.remove("show");}
+  /* ---- шити ---- */
+  function anyOpen(id){const e=$(id);return e&&e.classList.contains("show");}
+  function syncTabs(){$("u-panel").classList.toggle("on",anyOpen("panelLR"));$("u-time").classList.toggle("on",anyOpen("sheet-time"));}
+  function closeSheets(){document.querySelectorAll(".sheet").forEach(s=>s.classList.remove("show"));$("panelLR").classList.remove("show");$("card").classList.remove("show");$("sheet-back").classList.remove("show");syncTabs();}
+  function openSheet(id,modal,onOpen){closeSheets();if(onOpen)onOpen();$(id).classList.add("show");if(modal)$("sheet-back").classList.add("show");syncTabs();}
+  function closeSheet(id){$(id).classList.remove("show");if(![...document.querySelectorAll(".sheet")].some(s=>s.classList.contains("show")))$("sheet-back").classList.remove("show");syncTabs();}
+  document.querySelectorAll("[data-close]").forEach(b=>b.onclick=closeSheets);
+  $("sheet-back").onclick=closeSheets;
   function fillFromSelect(selId,listEl,onPick){const sel=$(selId);listEl.innerHTML="";[...sel.options].forEach(o=>{if(!o.value)return;const it=document.createElement("div");it.className="it";it.innerHTML="<span>"+o.textContent+"</span>";it.onclick=()=>onPick(o.value,o.textContent,it,listEl);listEl.appendChild(it);});}
 
-  /* ППО */
-  $("u-place").onclick=()=>togglePop("pop-place",$("u-place"),"right",()=>{$("pl-arm").textContent="";fillFromSelect("sel-pvo",$("pl-list"),(val,txt,it,list)=>{[...list.children].forEach(c=>c.classList.remove("on"));it.classList.add("on");SETUP.tool="pvo";SETUP.sel=val;SETUP.draft=null;setArmed();render();$("pl-arm").textContent="Озброєно: "+txt+" · тап по суші";});});
+  /* ППО (компактний, карта тапається) */
+  $("u-place").onclick=()=>openSheet("sheet-place",false,()=>{if(MOD.getTool())MOD.setTool(MOD.getTool());$("pl-arm").textContent="";fillFromSelect("sel-pvo",$("pl-list"),(val,txt,it,list)=>{[...list.children].forEach(c=>c.classList.remove("on"));it.classList.add("on");SETUP.tool="pvo";SETUP.sel=val;SETUP.draft=null;setArmed();render();$("pl-arm").textContent="Озброєно: "+txt+" · тап по суші";});});
   $("pl-auto").onclick=()=>{autoDeploy();render();toast("ППО РОЗГОРНУТО · "+SETUP.pvo.length);};
 
-  /* траєкторія */
+  /* траєкторія (компактний) */
   function updateTraj(){const n=(SETUP.draft&&SETUP.draft.pts.length)||0;$("tj-arm").textContent=SETUP.tool==="threat"?("Точок: "+n+" · тап по карті, тоді Підтвердити"):"Оберіть ціль/зброю";}
-  $("u-traj").onclick=()=>togglePop("pop-traj",$("u-traj"),"right",()=>{fillFromSelect("sel-threat",$("tj-list"),(val,txt,it,list)=>{[...list.children].forEach(c=>c.classList.remove("on"));it.classList.add("on");SETUP.tool="threat";SETUP.sel=val;SETUP.draft={model:val,pts:[]};setArmed();render();updateTraj();});updateTraj();});
+  $("u-traj").onclick=()=>openSheet("sheet-traj",false,()=>{if(MOD.getTool())MOD.setTool(MOD.getTool());fillFromSelect("sel-threat",$("tj-list"),(val,txt,it,list)=>{[...list.children].forEach(c=>c.classList.remove("on"));it.classList.add("on");SETUP.tool="threat";SETUP.sel=val;SETUP.draft={model:val,pts:[]};setArmed();render();updateTraj();});updateTraj();});
   $("tj-ok").onclick=()=>{$("b-confirm").click();updateTraj();};
   $("tj-clear").onclick=()=>{$("b-clear").click();updateTraj();};
-  map.on("click",()=>{if($("pop-traj").classList.contains("show"))setTimeout(updateTraj,0);});
+  map.on("click",()=>{if(anyOpen("sheet-traj"))setTimeout(updateTraj,0);});
 
-  /* малювання */
+  /* малювання (компактний) */
   const DCOLORS=["#22d3ee","#34d399","#ffd24a","#ff5a3c","#c084fc"];
-  (function(){const box=$("dw-colors");DCOLORS.forEach((c,i)=>{const s=document.createElement("span");s.style.cssText="width:22px;height:22px;border-radius:50%;cursor:pointer;background:"+c+";border:2px solid "+(i===0?"#2b2a27":"transparent");s.onclick=()=>{[...box.children].forEach(x=>x.style.borderColor="transparent");s.style.borderColor="#2b2a27";MOD.drawColor(c);};box.appendChild(s);});})();
+  (function(){const box=$("dw-colors");DCOLORS.forEach((c,i)=>{const s=document.createElement("span");s.style.cssText="width:24px;height:24px;border-radius:50%;cursor:pointer;background:"+c+";border:2px solid "+(i===0?"#2b2a27":"transparent");s.onclick=()=>{[...box.children].forEach(x=>x.style.borderColor="transparent");s.style.borderColor="#2b2a27";MOD.drawColor(c);};box.appendChild(s);});})();
   document.querySelectorAll("#dw-tools button").forEach(b=>b.onclick=()=>MOD.setTool(b.dataset.t));
   $("dw-ok").onclick=()=>MOD.drawOK();$("dw-reset").onclick=()=>MOD.drawReset();
-  $("u-draw").onclick=()=>togglePop("pop-draw",$("u-draw"),"right");
+  $("u-draw").onclick=()=>{if(SETUP.tool){SETUP.tool=null;SETUP.draft=null;setArmed();render();}openSheet("sheet-draw",false);};
   MOD._onInfo=(tool,pts,rd)=>{document.querySelectorAll("#dw-tools button").forEach(x=>x.classList.toggle("on",x.dataset.t===tool));const el=$("dw-arm");if(!el)return;if(!tool)el.textContent="Оберіть інструмент";else if(tool==="ruler")el.textContent="Лінійка · точок "+pts+(pts>1?" · "+rd.toFixed(1)+" км":"");else el.textContent=({marker:"Маркер",line:"Лінія",poly:"Полігон"}[tool])+" · точок "+pts;};
-  MOD._onSave=()=>{$("sv-name").value="";$("sv-group").value="";$("sv-note").value="";openPopAt("pop-save",$("u-draw"),"right");};
-  $("sv-ok").onclick=()=>{MOD.saveWith($("sv-name").value.trim(),$("sv-group").value.trim(),$("sv-note").value.trim());closePop("pop-save");};
-  $("sv-cancel").onclick=()=>{MOD.cancelSave();closePop("pop-save");};
+  MOD._onSave=()=>{$("sv-name").value="";$("sv-group").value="";$("sv-note").value="";openSheet("sheet-save",true);};
+  $("sv-ok").onclick=()=>{MOD.saveWith($("sv-name").value.trim(),$("sv-group").value.trim(),$("sv-note").value.trim());closeSheet("sheet-save");};
+  $("sv-cancel").onclick=()=>{MOD.cancelSave();closeSheet("sheet-save");};
 
-  /* дрони */
+  /* дрони (modal) */
   function renderDroneChips(){const box=$("dr-chips");if(!box)return;box.innerHTML="";MOD.droneTypes().forEach(t=>{const el=document.createElement("span");el.className="chip"+(MOD.droneActive(t)?" on":"");el.textContent=(MOD.droneUK&&MOD.droneUK[t])||t;el.onclick=()=>{MOD.droneToggleType(t);renderDroneChips();};box.appendChild(el);});}
   MOD._onDrones=renderDroneChips;
-  $("u-drones").onclick=()=>togglePop("pop-drones",$("u-drones"),"right",renderDroneChips);
+  $("u-drones").onclick=()=>openSheet("sheet-drones",true,renderDroneChips);
   $("dr-toggle").onclick=function(){const on=MOD.dronesToggle();this.textContent=on?"Сховати":"Показати";this.classList.toggle("on",on);};
   $("dr-demo").onclick=()=>{const n=MOD.droneDemo();const t=$("dr-toggle");t.textContent="Сховати";t.classList.add("on");renderDroneChips();toast("ДЕМО-ТРЕКИ · "+n);};
   $("dr-load").onclick=()=>MOD.droneLoad();
   document.querySelectorAll("#dr-mode button").forEach(b=>b.onclick=()=>{MOD.droneMode(b.dataset.m);document.querySelectorAll("#dr-mode button").forEach(x=>x.classList.toggle("on",x===b));});
 
-  /* журнал / панель / таймлайн / пуск */
-  $("u-panel").onclick=()=>{$("t-jour").click();$("u-panel").classList.toggle("on",$("panelLR").classList.contains("show"));};
-  $("u-time").onclick=()=>{const el=$("ui-tl");el.classList.toggle("show");$("u-time").classList.toggle("on",el.classList.contains("show"));};
+  /* журнал (modal) */
+  $("u-panel").onclick=()=>{const open=anyOpen("panelLR");closeSheets();if(!open){$("t-jour").click();$("sheet-back").classList.add("show");}syncTabs();};
+  $("jour-x").onclick=closeSheets;
+
+  /* таймлайн (компактний) */
+  $("u-time").onclick=()=>{if(anyOpen("sheet-time"))closeSheet("sheet-time");else openSheet("sheet-time",false);};
+
+  /* пуск */
   $("u-play").onclick=()=>$("b-launch").click();
 
-  /* пошук */
-  function renderCities(q){q=q.toLowerCase();const box=$("se-list");box.innerHTML="";CITIES.filter(c=>c[0].toLowerCase().includes(q)).slice(0,8).forEach(c=>{const it=document.createElement("div");it.className="it";it.innerHTML="<span>"+c[0]+"</span>";it.onclick=()=>{map.flyTo({center:[c[1],c[2]],zoom:8,duration:900});closePop("pop-search");};box.appendChild(it);});}
-  $("u-search").onclick=()=>togglePop("pop-search",$("u-search"),"right",()=>{$("se-input").value="";renderCities("");setTimeout(()=>$("se-input").focus(),60);});
+  /* пошук (modal) */
+  function renderCities(q){q=q.toLowerCase();const box=$("se-list");box.innerHTML="";CITIES.filter(c=>c[0].toLowerCase().includes(q)).slice(0,8).forEach(c=>{const it=document.createElement("div");it.className="it";it.innerHTML="<span>"+c[0]+"</span>";it.onclick=()=>{map.flyTo({center:[c[1],c[2]],zoom:8,duration:900});closeSheets();};box.appendChild(it);});}
+  $("u-search").onclick=()=>openSheet("sheet-search",true,()=>{$("se-input").value="";renderCities("");setTimeout(()=>$("se-input").focus(),120);});
   $("se-input").oninput=e=>renderCities(e.target.value);
 
-  /* шари / базова карта / інфо / сценарії */
+  /* шари / карта / інфо / сценарії */
   function syncLayerPop(){["ranges","paths","labels"].forEach(k=>{const el=$("lg-"+k);if(el)el.textContent=ENV.layers[k]?"✓":"—";});const s=$("lg-sat").querySelector("small");if(s)s.textContent=ENV.sat?"✓":"—";}
-  $("u-layers").onclick=()=>togglePop("pop-layers",$("u-layers"),"left",syncLayerPop);
-  document.querySelectorAll("#pop-layers .it[data-l]").forEach(it=>it.onclick=()=>{const k=it.dataset.l;ENV.layers[k]=!ENV.layers[k];render();syncLayerPop();});
+  $("u-layers").onclick=()=>openSheet("sheet-layers",true,syncLayerPop);
+  document.querySelectorAll("#sheet-layers .it[data-l]").forEach(it=>it.onclick=()=>{const k=it.dataset.l;ENV.layers[k]=!ENV.layers[k];render();syncLayerPop();});
   $("lg-sat").onclick=()=>{$("t-base").click();syncLayerPop();};
   $("u-base").onclick=()=>{$("t-base").click();$("u-base").classList.toggle("on",ENV.sat);};
-  $("u-info").onclick=()=>togglePop("pop-info",$("u-info"),"left");
-  $("u-person").onclick=()=>togglePop("pop-person",$("u-person"),"left");
-  $("ps-auto").onclick=()=>{autoDeploy();render();closePop("pop-person");toast("ППО РОЗГОРНУТО · "+SETUP.pvo.length);};
+  $("u-info").onclick=()=>openSheet("sheet-info",true);
+  $("u-person").onclick=()=>openSheet("sheet-person",true);
+  $("ps-auto").onclick=()=>{autoDeploy();render();closeSheets();toast("ППО РОЗГОРНУТО · "+SETUP.pvo.length);};
 
-  /* закрити / зняти */
-  $("u-close").onclick=()=>{closeAllPops();ENV.sel=null;$("card").classList.remove("show");SETUP.tool=null;SETUP.draft=null;setArmed();render();};
-
-  /* 3D / замок / FAB */
+  /* 3D / замок / FAB / звіт */
   $("u-3d").onclick=function(){const p=map.getPitch()>10?0:48;map.easeTo({pitch:p,duration:500});this.classList.toggle("on",p>10);};
   let locked=false;
   $("u-lock").onclick=function(){locked=!locked;["dragPan","scrollZoom","boxZoom","dragRotate","touchZoomRotate","doubleClickZoom","keyboard"].forEach(k=>{if(map[k]){locked?map[k].disable():map[k].enable();}});this.classList.toggle("on",locked);toast(locked?"КАРТУ ЗАБЛОКОВАНО":"КАРТУ РОЗБЛОКОВАНО");};
   $("ui-fab").onclick=()=>{if(typeof RUN!=="undefined"&&RUN&&ENV.phase!=="setup"){if(typeof showReport==="function")showReport();$("report").classList.add("show");}else toast("ФАЗА · ПІДГОТОВКА");};
+  $("rep-x").onclick=()=>$("report").classList.remove("show");
+  $("report").onclick=e=>{if(e.target.id==="report")$("report").classList.remove("show");};
 
   /* вертикальна шкала → зум */
   const track=$("u-track"),fill=$("u-fill"),thumb=$("u-thumb"),Z_MIN=4,Z_MAX=9;
@@ -1188,13 +1214,13 @@ if(document.fonts&&document.fonts.ready)document.fonts.ready.then(()=>render());
   track.addEventListener("pointerup",()=>dragging=false);
   map.on("zoom",zoomToFrac);setTimeout(zoomToFrac,300);
 
-  /* синхронізація стану */
+  /* синхронізація */
   setInterval(()=>{
     $("u-play").classList.toggle("on",ENV.playing&&ENV.phase==="run");
     $("u-base").classList.toggle("on",ENV.sat);
-    $("u-panel").classList.toggle("on",$("panelLR").classList.contains("show"));
     $("u-3d").classList.toggle("on",map.getPitch()>10);
-    if(ENV.phase==="run"&&$("ui-tl").dataset.auto!=="1"){$("ui-tl").classList.add("show");$("ui-tl").dataset.auto="1";$("u-time").classList.add("on");}
+    if(ENV.phase==="run"&&$("sheet-time").dataset.auto!=="1"){openSheet("sheet-time",false);$("sheet-time").dataset.auto="1";}
+    syncTabs();
   },250);
 })();
 </script>
