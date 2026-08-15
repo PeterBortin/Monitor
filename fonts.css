@@ -1,0 +1,2 @@
+/* Font binaries are not copied into this project; --ds-font-* stacks fall back to
+   the platform faces (SF Pro on Apple, system UI elsewhere). */

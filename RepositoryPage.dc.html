@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<!-- @template name="Repository page" description="Code-hosting page: dark global header, repository page header with tabs, file list, README and an About rail." -->
+<helmet><script src="./ds-base.js"></script></helmet>
+<div style="min-height:100vh;background:var(--bgcolor-default);font-family:var(--ds-font-sans)">
+<x-import component-from-global-scope="PrimerDesignSystem_285f8d.Header" brand="myFPV" hint-size="100%,64px"></x-import>
+<div style="padding:16px 32px 0;border-bottom:1px solid var(--bordercolor-muted)">
+<div style="display:flex;align-items:center;gap:8px;font-size:12px;line-height:20px;color:var(--fgcolor-muted)">
+<a href="#" style="color:var(--fgcolor-link)">codecrafters</a><span>/</span><span>design-system</span>
+</div>
+<div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-top:8px">
+<span style="display:inline-flex;color:var(--fgcolor-muted)"><x-import component-from-global-scope="PrimerDesignSystem_285f8d.Icon" name="Repo" size="16" hint-size="16px,16px"></x-import></span>
+<h1 style="flex:1 1 auto;min-width:0;margin:0;font-size:20px;line-height:32px;font-weight:600;color:var(--fgcolor-default)"><a href="#" style="color:var(--fgcolor-link);font-weight:400">codecrafters</a> <span style="color:var(--fgcolor-muted);font-weight:400">/</span> <a href="#" style="color:var(--fgcolor-link)">design-system</a></h1>
+<x-import component-from-global-scope="PrimerDesignSystem_285f8d.Label" variant="secondary" hint-size="60px,20px">Public</x-import>
+<span style="display:flex;align-items:center;gap:8px;margin-left:auto">
+<x-import component-from-global-scope="PrimerDesignSystem_285f8d.Button" size="small" count="128" hint-size="110px,28px">Unwatch</x-import>
+<x-import component-from-global-scope="PrimerDesignSystem_285f8d.Button" size="small" count="41" hint-size="90px,28px">Fork</x-import>
+<x-import component-from-global-scope="PrimerDesignSystem_285f8d.Button" size="small" count="1420" hint-size="110px,28px">Star</x-import>
+</span>
+</div>
+<div style="margin-top:8px">
+<x-import component-from-global-scope="PrimerDesignSystem_285f8d.UnderlineNav" items="{{ tabs }}" hint-size="100%,48px"></x-import>
+</div>
+</div>
+<div style="display:flex;flex-wrap:wrap;gap:24px;align-items:flex-start;padding:24px 32px 48px;max-width:1400px">
+<div style="flex:1 1 250px;max-width:320px;min-width:0;border:1px solid var(--bordercolor-muted);border-radius:6px;padding:8px">
+<div style="display:flex;align-items:center;justify-content:space-between;padding:0 8px 8px;font-size:14px;line-height:20px;font-weight:600;color:var(--fgcolor-default)">Files</div>
+<x-import component-from-global-scope="PrimerDesignSystem_285f8d.TreeView" nodes="{{ tree }}" hint-size="100%,180px"></x-import>
+</div>
+<div style="flex:4 1 460px;min-width:0;display:flex;flex-direction:column;gap:16px">
+<div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap">
+<x-import component-from-global-scope="PrimerDesignSystem_285f8d.Button" size="small" hint-size="90px,28px">main</x-import>
+<span style="font-size:12px;line-height:20px;color:var(--fgcolor-muted)">14 branches · 92 tags</span>
+<span style="display:flex;gap:8px;margin-left:auto">
+<x-import component-from-global-scope="PrimerDesignSystem_285f8d.Button" size="small" hint-size="100px,28px">Go to file</x-import>
+<x-import component-from-global-scope="PrimerDesignSystem_285f8d.Button" size="small" variant="primary" hint-size="72px,28px">Code</x-import>
+</span>
+</div>
+<div style="border:1px solid var(--bordercolor-muted);border-radius:6px;overflow:hidden">
+<div style="display:flex;align-items:center;gap:8px;padding:8px 16px;background:var(--bgcolor-muted);border-bottom:1px solid var(--bordercolor-muted);font-size:12px;line-height:20px;color:var(--fgcolor-muted)">
+<a href="#" style="color:var(--fgcolor-link);font-weight:600">monalisa</a>
+<span>Add ActionList density options</span>
+<span style="margin-left:auto">a1b2c3d · 2 hours ago · 1,284 commits</span>
+</div>
+<sc-for list="{{ files }}" as="file" hint-placeholder-count="5">
+<div style="display:flex;align-items:center;gap:8px;padding:6px 16px;border-top:1px solid var(--bordercolor-muted);font-size:14px;line-height:20px">
+<span style="display:inline-flex;color:var(--fgcolor-muted)"><x-import component-from-global-scope="PrimerDesignSystem_285f8d.Icon" name="{{ file.icon }}" size="16" hint-size="16px,16px"></x-import></span>
+<a href="#" style="flex:0 1 200px;min-width:96px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;color:var(--fgcolor-default)">{{ file.name }}</a>
+<span style="flex:1 1 auto;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;color:var(--fgcolor-muted)">{{ file.message }}</span>
+<span style="flex-shrink:0;font-size:12px;color:var(--fgcolor-muted)">{{ file.when }}</span>
+</div>
+</sc-for>
+</div>
+<div>
+<h3 style="margin:0 0 8px;font-size:16px;line-height:24px;font-weight:600;color:var(--fgcolor-default)">README.md</h3>
+<div style="border:1px solid var(--bordercolor-muted);border-radius:6px;padding:32px">
+<div class="ds-markdown">
+<h1>design-system</h1>
+<p>Components, tokens and guidelines for our product surfaces.</p>
+<h2>Install</h2>
+<pre>npm install @codecrafters/design-system</pre>
+<p>See the <a href="#">contributing guide</a> before opening a pull request.</p>
+</div>
+</div>
+</div>
+</div>
+<div style="flex:1 1 250px;max-width:320px;min-width:0;display:flex;flex-direction:column;gap:24px">
+<section>
+<div style="font-size:14px;line-height:20px;font-weight:600;color:var(--fgcolor-default);margin-bottom:8px">About</div>
+<p style="margin:0 0 12px;font-size:14px;line-height:20px;color:var(--fgcolor-default)">Components, tokens and guidelines for building product interfaces.</p>
+<div style="display:flex;flex-wrap:wrap;gap:6px">
+<x-import component-from-global-scope="PrimerDesignSystem_285f8d.TopicTag" href="#" hint-size="110px,24px">design-systems</x-import>
+<x-import component-from-global-scope="PrimerDesignSystem_285f8d.TopicTag" href="#" hint-size="60px,24px">react</x-import>
+<x-import component-from-global-scope="PrimerDesignSystem_285f8d.TopicTag" href="#" hint-size="50px,24px">css</x-import>
+</div>
+</section>
+<section style="border-top:1px solid var(--bordercolor-muted);padding-top:16px">
+<div style="font-size:14px;line-height:20px;font-weight:600;color:var(--fgcolor-default);margin-bottom:8px">Languages</div>
+<x-import component-from-global-scope="PrimerDesignSystem_285f8d.ProgressBar" size="small" items="{{ languages }}" hint-size="100%,4px"></x-import>
+<div style="display:flex;flex-direction:column;gap:4px;margin-top:12px">
+<sc-for list="{{ languages }}" as="lang" hint-placeholder-count="4">
+<span style="display:inline-flex;align-items:center;gap:6px;font-size:12px;line-height:20px">
+<x-import component-from-global-scope="PrimerDesignSystem_285f8d.ColorDot" size="small" color="{{ lang.color }}" hint-size="8px,8px"></x-import>
+<b style="font-weight:600;color:var(--fgcolor-default)">{{ lang.name }}</b>
+<span style="color:var(--fgcolor-muted)">{{ lang.label }}</span>
+</span>
+</sc-for>
+</div>
+</section>
+</div>
+</div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{&quot;$preview&quot;:{&quot;width&quot;:1280,&quot;height&quot;:900}}">
+class Component extends DCLogic {
+  renderVals() {
+    return {
+      tabs: [
+        { text: 'Code', current: true },
+        { text: 'Issues', counter: 42 },
+        { text: 'Pull requests', counter: 7 },
+        { text: 'Actions' },
+        { text: 'Projects' },
+        { text: 'Security' },
+        { text: 'Insights' },
+      ],
+      tree: [
+        { name: '.github', path: '.github', children: [{ name: 'workflows', path: '.github/workflows', children: [{ name: 'ci.yml', path: '.github/workflows/ci.yml' }] }] },
+        { name: 'src', path: 'src', defaultExpanded: true, children: [
+          { name: 'components', path: 'src/components', children: [{ name: 'Button.tsx', path: 'src/components/Button.tsx' }] },
+          { name: 'index.ts', path: 'src/index.ts' },
+        ] },
+        { name: 'README.md', path: 'README.md' },
+        { name: 'package.json', path: 'package.json' },
+      ],
+      files: [
+        { name: '.github', icon: 'FileDirectory', message: 'Pin the CI runner image', when: '2 days ago' },
+        { name: 'src', icon: 'FileDirectory', message: 'Add ActionList density options', when: '2 hours ago' },
+        { name: '.editorconfig', icon: 'File', message: 'Normalise line endings', when: 'last month' },
+        { name: 'README.md', icon: 'File', message: 'Document the density modes', when: '2 hours ago' },
+        { name: 'package.json', icon: 'File', message: 'Release 37.2.0', when: 'yesterday' },
+      ],
+      languages: [
+        { name: 'TypeScript', progress: 62.4, label: '62.4%', color: 'var(--data-blue-color-emphasis)' },
+        { name: 'CSS', progress: 24.1, label: '24.1%', color: 'var(--data-purple-color-emphasis)' },
+        { name: 'JavaScript', progress: 9.8, label: '9.8%', color: 'var(--data-yellow-color-emphasis)' },
+        { name: 'Other', progress: 3.7, label: '3.7%', color: 'var(--data-gray-color-emphasis)' },
+      ],
+    };
+  }
+}
+</script>
+</body>
+</html>

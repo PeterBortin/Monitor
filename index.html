@@ -1,0 +1,943 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<script src="./ds-base.js"></script>
+<style>
+html,body{margin:0;padding:0;-webkit-text-size-adjust:100%}
+[contenteditable]{outline:none;-webkit-user-modify:read-write-plaintext-only}
+[contenteditable="true"]{-webkit-user-modify:read-write}
+[data-ph]:empty:before{content:attr(data-ph);color:var(--fgcolor-muted);pointer-events:none}
+a{color:var(--fgcolor-link);text-decoration:none}
+a:hover{color:var(--fgcolor-link);text-decoration:underline}
+@keyframes sheetUp{from{transform:translateY(16px);opacity:0}to{transform:translateY(0);opacity:1}}
+@keyframes fadeIn{from{opacity:0}to{opacity:1}}
+</style>
+</helmet>
+<div style="min-height:100vh;background:var(--bgcolor-default);color:var(--fgcolor-default);font-family:var(--ds-font-sans);font-size:14px;line-height:20px">
+
+<sc-if value="{{ isDrafts }}" hint-placeholder-val="{{ true }}">
+<div style="max-width:720px;margin:0 auto;padding:0 16px 96px">
+<div style="display:flex;align-items:center;gap:12px;padding:16px 0 8px;position:sticky;top:0;background:var(--bgcolor-default);z-index:5">
+<h1 style="flex:1 1 auto;margin:0;font-family:var(--ds-font-display);font-size:24px;line-height:32px;font-weight:600">Мої статті</h1>
+<button onClick="{{ newDraft }}" style="display:flex;align-items:center;gap:6px;min-height:40px;padding:0 14px;border:0;border-radius:6px;background:var(--myfpv-4,#64FE13);color:var(--myfpv-9,#0b1a02);font-family:inherit;font-size:14px;font-weight:600;cursor:pointer">
+<x-import component-from-global-scope="PrimerDesignSystem_285f8d.Icon" name="Plus" size="16" hint-size="16px,16px"></x-import>Нова</button>
+</div>
+<div style="display:flex;gap:6px;padding:8px 0 16px;overflow-x:auto">
+<sc-for list="{{ filters }}" as="f" hint-placeholder-count="3">
+<button onClick="{{ f.onPick }}" style="min-height:32px;padding:0 12px;border-radius:9999px;border:1px solid var(--bordercolor-default);background:{{ f.bg }};color:{{ f.fg }};font-family:inherit;font-size:12px;font-weight:600;white-space:nowrap;cursor:pointer">{{ f.label }}</button>
+</sc-for>
+</div>
+<div style="display:flex;flex-direction:column">
+<sc-for list="{{ drafts }}" as="d" hint-placeholder-count="4">
+<button onClick="{{ d.onOpen }}" style="display:flex;flex-direction:column;gap:6px;align-items:stretch;text-align:left;padding:14px 0;border:0;border-top:1px solid var(--bordercolor-muted);background:transparent;color:inherit;font-family:inherit;cursor:pointer">
+<div style="display:flex;align-items:flex-start;gap:8px">
+<span style="flex:1 1 auto;min-width:0;font-size:16px;line-height:24px;font-weight:600">{{ d.title }}</span>
+<span style="flex-shrink:0;display:inline-flex;align-items:center;min-height:20px;padding:0 8px;border-radius:9999px;border:1px solid var(--bordercolor-default);font-size:12px;color:var(--fgcolor-muted)">{{ d.state }}</span>
+</div>
+<span style="font-size:12px;color:var(--fgcolor-muted)">{{ d.meta }}</span>
+</button>
+</sc-for>
+</div>
+</div>
+</sc-if>
+
+<sc-if value="{{ isEditor }}" hint-placeholder-val="{{ true }}">
+<div style="display:flex;align-items:center;gap:4px;position:sticky;top:0;z-index:20;padding:8px 4px;background:var(--bgcolor-default);border-bottom:1px solid var(--bordercolor-muted)">
+<button onClick="{{ goDrafts }}" aria-label="Назад" style="display:flex;align-items:center;justify-content:center;width:44px;height:44px;border:0;background:transparent;color:var(--fgcolor-default);cursor:pointer">
+<x-import component-from-global-scope="PrimerDesignSystem_285f8d.Icon" name="ArrowLeft" size="16" hint-size="16px,16px"></x-import></button>
+<div style="flex:1 1 auto;min-width:0;display:flex;flex-direction:column">
+<span style="font-size:12px;font-weight:600;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">{{ docLabel }}</span>
+<span style="font-size:12px;color:var(--fgcolor-muted)">{{ saveLabel }}</span>
+</div>
+<button onClick="{{ toggleMode }}" style="display:flex;align-items:center;gap:6px;min-height:36px;padding:0 10px;border:1px solid var(--bordercolor-default);border-radius:6px;background:var(--bgcolor-muted);color:var(--fgcolor-default);font-family:inherit;font-size:12px;font-weight:600;cursor:pointer">{{ modeLabel }}</button>
+<button onClick="{{ publish }}" style="display:flex;align-items:center;min-height:36px;padding:0 12px;margin-right:4px;border:0;border-radius:6px;background:var(--myfpv-4,#64FE13);color:var(--myfpv-9,#0b1a02);font-family:inherit;font-size:12px;font-weight:600;cursor:pointer">Опублікувати</button>
+</div>
+
+<div style="display:flex;align-items:flex-start;justify-content:center;gap:32px;padding:0 0 120px">
+<sc-if value="{{ showRail }}" hint-placeholder-val="{{ false }}">
+<div style="position:sticky;top:76px;width:220px;flex-shrink:0;padding:24px 0 0;display:flex;flex-direction:column;gap:2px">
+<span style="font-size:12px;font-weight:600;color:var(--fgcolor-muted);padding:0 8px 8px">Структура</span>
+<sc-for list="{{ outline }}" as="o" hint-placeholder-count="4">
+<button onClick="{{ o.onGo }}" style="text-align:left;padding:6px 8px 6px {{ o.indent }};border:0;border-left:2px solid {{ o.mark }};background:transparent;color:var(--fgcolor-muted);font-family:inherit;font-size:12px;cursor:pointer">{{ o.label }}</button>
+</sc-for>
+<div style="margin-top:16px;padding:8px;border:1px solid var(--bordercolor-muted);border-radius:6px;font-size:12px;color:var(--fgcolor-muted)">{{ statsLine }}</div>
+</div>
+</sc-if>
+
+<div style="flex:1 1 auto;min-width:0;max-width:720px;padding:16px 12px 0">
+<div contenteditable="{{ isEdit }}" data-ph="Заголовок статті" ref="{{ titleRef }}" onInput="{{ titleInput }}" style="font-family:var(--ds-font-display);font-size:28px;line-height:36px;font-weight:600;padding:4px;border-radius:6px"></div>
+<div style="display:flex;flex-wrap:wrap;gap:8px;padding:8px 4px 4px;font-size:12px;color:var(--fgcolor-muted)">{{ statsLine }}</div>
+
+<div style="display:flex;flex-direction:column;gap:2px;padding-top:8px">
+<sc-for list="{{ blocks }}" as="b" hint-placeholder-count="5">
+<div onTouchStart="{{ b.holdStart }}" onTouchEnd="{{ b.holdEnd }}" onTouchMove="{{ b.holdEnd }}" onContextMenu="{{ b.ctx }}" style="position:relative;display:flex;align-items:flex-start;gap:2px;border-radius:6px;background:{{ b.hl }}">
+<div style="flex:1 1 auto;min-width:0">
+
+<sc-if value="{{ b.isP }}" hint-placeholder-val="{{ true }}">
+<div contenteditable="{{ b.editable }}" data-ph="Текст, або «/» для вставки блоку" ref="{{ b.ref }}" onInput="{{ b.input }}" onKeyDown="{{ b.key }}" style="font-size:16px;line-height:26px;padding:6px 4px;border-radius:6px"></div>
+</sc-if>
+<sc-if value="{{ b.isH2 }}" hint-placeholder-val="{{ false }}">
+<h2 contenteditable="{{ b.editable }}" data-ph="Розділ" ref="{{ b.ref }}" onInput="{{ b.input }}" onKeyDown="{{ b.key }}" style="margin:20px 0 4px;font-family:var(--ds-font-display);font-size:24px;line-height:32px;font-weight:600;padding:2px 4px;border-radius:6px"></h2>
+</sc-if>
+<sc-if value="{{ b.isH3 }}" hint-placeholder-val="{{ false }}">
+<h3 contenteditable="{{ b.editable }}" data-ph="Підрозділ" ref="{{ b.ref }}" onInput="{{ b.input }}" onKeyDown="{{ b.key }}" style="margin:14px 0 2px;font-size:18px;line-height:26px;font-weight:600;padding:2px 4px;border-radius:6px"></h3>
+</sc-if>
+<sc-if value="{{ b.isList }}" hint-placeholder-val="{{ false }}">
+<ul contenteditable="{{ b.editable }}" ref="{{ b.ref }}" onInput="{{ b.input }}" onKeyDown="{{ b.key }}" style="margin:4px 0;padding:2px 4px 2px 24px;font-size:16px;line-height:26px;border-radius:6px"></ul>
+</sc-if>
+<sc-if value="{{ b.isQuote }}" hint-placeholder-val="{{ false }}">
+<blockquote contenteditable="{{ b.editable }}" data-ph="Цитата" ref="{{ b.ref }}" onInput="{{ b.input }}" onKeyDown="{{ b.key }}" style="margin:8px 0;padding:4px 4px 4px 16px;border-left:4px solid var(--underlinenav-bordercolor-active,#fd8c73);font-size:16px;line-height:26px;color:var(--fgcolor-muted)"></blockquote>
+</sc-if>
+<sc-if value="{{ b.isCode }}" hint-placeholder-val="{{ false }}">
+<pre contenteditable="{{ b.editable }}" ref="{{ b.ref }}" onInput="{{ b.input }}" onKeyDown="{{ b.key }}" style="margin:8px 0;padding:12px;border:1px solid var(--bordercolor-muted);border-radius:6px;background:var(--bgcolor-muted);font-family:var(--ds-font-mono);font-size:13px;line-height:20px;overflow-x:auto;white-space:pre-wrap"></pre>
+</sc-if>
+<sc-if value="{{ b.isDivider }}" hint-placeholder-val="{{ false }}">
+<hr style="margin:16px 4px;border:0;border-top:1px solid var(--bordercolor-default)">
+</sc-if>
+<sc-if value="{{ b.isNote }}" hint-placeholder-val="{{ false }}">
+<aside style="display:flex;gap:10px;margin:10px 0;padding:10px 12px;border-left:4px solid var(--underlinenav-bordercolor-active,#fd8c73);background:var(--bgcolor-muted);border-radius:0 6px 6px 0">
+<span style="flex-shrink:0;color:var(--fgcolor-muted);padding-top:3px"><x-import component-from-global-scope="PrimerDesignSystem_285f8d.Icon" name="Note" size="16" hint-size="16px,16px"></x-import></span>
+<div contenteditable="{{ b.editable }}" data-ph="Ремарка на полях" ref="{{ b.ref }}" onInput="{{ b.input }}" style="flex:1 1 auto;min-width:0;font-size:14px;line-height:22px;color:var(--fgcolor-muted)"></div>
+</aside>
+</sc-if>
+
+<sc-if value="{{ b.isSpoiler }}" hint-placeholder-val="{{ false }}">
+<div style="margin:10px 0;border:1px solid var(--bordercolor-muted);border-radius:6px;overflow:hidden">
+<div style="display:flex;align-items:center;gap:8px;padding:10px 12px;background:var(--bgcolor-muted)">
+<button onClick="{{ b.sToggle }}" aria-label="Розкрити" style="flex-shrink:0;display:flex;align-items:center;justify-content:center;width:28px;height:28px;border:1px solid var(--bordercolor-default);border-radius:6px;background:var(--bgcolor-default);color:var(--fgcolor-default);cursor:pointer">
+<x-import component-from-global-scope="PrimerDesignSystem_285f8d.Icon" name="{{ b.sIcon }}" size="16" hint-size="16px,16px"></x-import></button>
+<div contenteditable="{{ b.editable }}" data-ph="Питання" ref="{{ b.sumRef }}" onInput="{{ b.sumInput }}" style="flex:1 1 auto;min-width:0;font-size:15px;line-height:22px;font-weight:600"></div>
+</div>
+<sc-if value="{{ b.sOpen }}" hint-placeholder-val="{{ true }}">
+<div contenteditable="{{ b.editable }}" data-ph="Відповідь" ref="{{ b.bodyRef }}" onInput="{{ b.bodyInput }}" style="padding:12px;font-size:15px;line-height:24px;border-top:1px solid var(--bordercolor-muted)"></div>
+</sc-if>
+</div>
+</sc-if>
+
+<sc-if value="{{ b.isPoll }}" hint-placeholder-val="{{ false }}">
+<div style="margin:12px 0;padding:12px;border:1px solid var(--bordercolor-muted);border-radius:6px">
+<div style="display:flex;align-items:center;gap:6px;font-size:12px;font-weight:600;color:var(--fgcolor-muted);padding-bottom:8px">
+<x-import component-from-global-scope="PrimerDesignSystem_285f8d.Icon" name="Graph" size="16" hint-size="16px,16px"></x-import>Опитування</div>
+<div contenteditable="{{ b.editable }}" data-ph="Питання" ref="{{ b.qRef }}" onInput="{{ b.qInput }}" style="font-size:16px;line-height:24px;font-weight:600;padding-bottom:10px"></div>
+<div style="display:flex;flex-direction:column;gap:8px">
+<sc-for list="{{ b.pOpts }}" as="o" hint-placeholder-count="3">
+<div onClick="{{ o.onVote }}" style="position:relative;display:flex;align-items:center;gap:10px;min-height:44px;padding:0 12px;border:1px solid {{ o.border }};border-radius:6px;overflow:hidden;cursor:pointer">
+<span style="position:absolute;left:0;top:0;bottom:0;width:{{ o.pct }};background:{{ o.fill }};transition:width .2s cubic-bezier(.33,1,.68,1)"></span>
+<span contenteditable="{{ b.editable }}" ref="{{ o.ref }}" onInput="{{ o.input }}" style="position:relative;flex:1 1 auto;min-width:0;font-size:14px;line-height:20px;font-weight:{{ o.weight }}"></span>
+<span style="position:relative;flex-shrink:0;font-size:12px;color:var(--fgcolor-muted)">{{ o.label }}</span>
+</div>
+</sc-for>
+</div>
+<div style="padding-top:8px;font-size:12px;color:var(--fgcolor-muted)">{{ b.pTotal }}</div>
+</div>
+</sc-if>
+
+<sc-if value="{{ b.isQuiz }}" hint-placeholder-val="{{ false }}">
+<div style="margin:12px 0;padding:12px;border:1px solid var(--bordercolor-muted);border-radius:6px">
+<div style="display:flex;align-items:center;gap:6px;font-size:12px;font-weight:600;color:var(--fgcolor-muted);padding-bottom:8px">
+<x-import component-from-global-scope="PrimerDesignSystem_285f8d.Icon" name="Checklist" size="16" hint-size="16px,16px"></x-import>Квіз{{ b.qzHint }}</div>
+<div contenteditable="{{ b.editable }}" data-ph="Питання" ref="{{ b.qRef }}" onInput="{{ b.qInput }}" style="font-size:16px;line-height:24px;font-weight:600;padding-bottom:10px"></div>
+<div style="display:flex;flex-direction:column;gap:8px">
+<sc-for list="{{ b.qzOpts }}" as="o" hint-placeholder-count="3">
+<div onClick="{{ o.onPick }}" style="display:flex;align-items:center;gap:10px;min-height:44px;padding:0 12px;border:1px solid {{ o.border }};border-radius:6px;background:{{ o.bg }};cursor:pointer">
+<span contenteditable="{{ b.editable }}" ref="{{ o.ref }}" onInput="{{ o.input }}" style="flex:1 1 auto;min-width:0;font-size:14px;line-height:20px"></span>
+<sc-if value="{{ o.showMark }}" hint-placeholder-val="{{ false }}">
+<span style="flex-shrink:0;display:inline-flex;color:{{ o.markColor }}"><x-import component-from-global-scope="PrimerDesignSystem_285f8d.Icon" name="{{ o.mark }}" size="16" hint-size="16px,16px"></x-import></span>
+</sc-if>
+</div>
+</sc-for>
+</div>
+<sc-if value="{{ b.qzShowWhy }}" hint-placeholder-val="{{ false }}">
+<div contenteditable="{{ b.editable }}" ref="{{ b.whyRef }}" onInput="{{ b.whyInput }}" style="margin-top:10px;padding:10px;border-radius:6px;background:var(--bgcolor-muted);font-size:13px;line-height:20px;color:var(--fgcolor-muted)"></div>
+</sc-if>
+<sc-if value="{{ b.qzCanReset }}" hint-placeholder-val="{{ false }}">
+<button onClick="{{ b.qzReset }}" style="margin-top:10px;min-height:32px;padding:0 12px;border:1px solid var(--bordercolor-default);border-radius:6px;background:var(--bgcolor-muted);color:var(--fgcolor-default);font-family:inherit;font-size:12px;font-weight:600;cursor:pointer">Спробувати ще</button>
+</sc-if>
+</div>
+</sc-if>
+<sc-if value="{{ b.isRun }}" hint-placeholder-val="{{ false }}">
+<div style="margin:12px 0;border:1px solid var(--bordercolor-muted);border-radius:6px;overflow:hidden">
+<div style="display:flex;align-items:center;gap:8px;padding:8px 10px;background:var(--bgcolor-muted);border-bottom:1px solid var(--bordercolor-muted)">
+<span style="display:inline-flex;color:var(--fgcolor-muted)"><x-import component-from-global-scope="PrimerDesignSystem_285f8d.Icon" name="FileCode" size="16" hint-size="16px,16px"></x-import></span>
+<span style="flex:1 1 auto;font-size:12px;font-weight:600;color:var(--fgcolor-muted)">JavaScript · виконується у браузері читача</span>
+<button onClick="{{ b.rRun }}" style="display:flex;align-items:center;gap:6px;min-height:32px;padding:0 10px;border:0;border-radius:6px;background:var(--myfpv-4,#64FE13);color:var(--myfpv-9,#0b1a02);font-family:inherit;font-size:12px;font-weight:600;cursor:pointer">
+<x-import component-from-global-scope="PrimerDesignSystem_285f8d.Icon" name="Play" size="16" hint-size="16px,16px"></x-import>Запустити</button>
+</div>
+<pre contenteditable="{{ b.editable }}" ref="{{ b.rRef }}" onInput="{{ b.rInput }}" style="margin:0;padding:12px;font-family:var(--ds-font-mono);font-size:13px;line-height:20px;white-space:pre-wrap;overflow-x:auto"></pre>
+<sc-if value="{{ b.rRan }}" hint-placeholder-val="{{ false }}">
+<div style="padding:10px 12px;border-top:1px solid var(--bordercolor-muted);background:var(--bgcolor-inset,#0d1108);font-family:var(--ds-font-mono);font-size:13px;line-height:20px;white-space:pre-wrap;color:{{ b.rColor }}">{{ b.rOut }}</div>
+</sc-if>
+</div>
+</sc-if>
+
+<sc-if value="{{ b.isCompare }}" hint-placeholder-val="{{ false }}">
+<div style="margin:12px 0">
+<div style="position:relative;height:200px;border:1px solid var(--bordercolor-muted);border-radius:6px;overflow:hidden;background:var(--bgcolor-muted)">
+<div style="position:absolute;inset:0;display:flex;align-items:flex-end;padding:10px;background:repeating-linear-gradient(135deg,var(--bgcolor-inset,#0d1108) 0 10px,var(--bgcolor-muted) 10px 20px)">
+<span contenteditable="{{ b.editable }}" ref="{{ b.cbRef }}" onInput="{{ b.cbInput }}" style="padding:2px 8px;border-radius:9999px;background:var(--overlay-bgcolor,#12180d);font-size:12px;font-weight:600"></span>
+</div>
+<div style="position:absolute;top:0;bottom:0;left:0;width:{{ b.cPct }};overflow:hidden;border-right:2px solid var(--myfpv-4,#64FE13)">
+<div style="position:absolute;inset:0;width:{{ b.cWidth }};display:flex;align-items:flex-end;padding:10px;background:repeating-linear-gradient(135deg,var(--bgcolor-muted) 0 10px,var(--bgcolor-default) 10px 20px)">
+<span contenteditable="{{ b.editable }}" ref="{{ b.caRef }}" onInput="{{ b.caInput }}" style="padding:2px 8px;border-radius:9999px;background:var(--overlay-bgcolor,#12180d);font-size:12px;font-weight:600"></span>
+</div>
+</div>
+</div>
+<input type="range" min="0" max="100" value="{{ b.cPos }}" onChange="{{ b.cSet }}" onInput="{{ b.cSet }}" aria-label="Порівняння до і після" style="width:100%;margin-top:10px;height:44px;accent-color:var(--myfpv-4,#64FE13);cursor:ew-resize">
+</div>
+</sc-if>
+
+<sc-if value="{{ b.isGallery }}" hint-placeholder-val="{{ false }}">
+<div style="margin:12px 0">
+<div style="position:relative;height:200px;border:1px solid var(--bordercolor-muted);border-radius:6px;background:var(--bgcolor-muted);display:flex;align-items:center;justify-content:center;overflow:hidden">
+<span style="display:flex;flex-direction:column;align-items:center;gap:6px;color:var(--fgcolor-muted);font-size:12px">
+<x-import component-from-global-scope="PrimerDesignSystem_285f8d.Icon" name="Image" size="24" hint-size="24px,24px"></x-import>{{ b.gSlot }}</span>
+<button onClick="{{ b.gPrev }}" aria-label="Попереднє" style="position:absolute;left:8px;display:flex;align-items:center;justify-content:center;width:44px;height:44px;border:1px solid var(--bordercolor-default);border-radius:9999px;background:var(--overlay-bgcolor,#12180d);color:var(--fgcolor-default);cursor:pointer">
+<x-import component-from-global-scope="PrimerDesignSystem_285f8d.Icon" name="ChevronLeft" size="16" hint-size="16px,16px"></x-import></button>
+<button onClick="{{ b.gNext }}" aria-label="Наступне" style="position:absolute;right:8px;display:flex;align-items:center;justify-content:center;width:44px;height:44px;border:1px solid var(--bordercolor-default);border-radius:9999px;background:var(--overlay-bgcolor,#12180d);color:var(--fgcolor-default);cursor:pointer">
+<x-import component-from-global-scope="PrimerDesignSystem_285f8d.Icon" name="ChevronRight" size="16" hint-size="16px,16px"></x-import></button>
+</div>
+<div style="display:flex;align-items:center;gap:8px;padding-top:8px">
+<div style="display:flex;gap:4px">
+<sc-for list="{{ b.gDots }}" as="d" hint-placeholder-count="3">
+<span style="width:6px;height:6px;border-radius:9999px;background:{{ d.bg }}"></span>
+</sc-for>
+</div>
+<span contenteditable="{{ b.editable }}" data-ph="Підпис" ref="{{ b.gRef }}" onInput="{{ b.gInput }}" style="flex:1 1 auto;min-width:0;font-size:12px;line-height:20px;color:var(--fgcolor-muted)"></span>
+</div>
+</div>
+</sc-if>
+<sc-if value="{{ b.isCalc }}" hint-placeholder-val="{{ false }}">
+<div style="margin:12px 0;padding:12px;border:1px solid var(--bordercolor-muted);border-radius:6px">
+<div contenteditable="{{ b.editable }}" data-ph="Назва калькулятора" ref="{{ b.qRef }}" onInput="{{ b.qInput }}" style="font-size:16px;line-height:24px;font-weight:600;padding-bottom:10px"></div>
+<div style="display:flex;flex-direction:column;gap:8px">
+<sc-for list="{{ b.kFields }}" as="f" hint-placeholder-count="3">
+<label style="display:flex;align-items:center;gap:10px;font-size:14px">
+<span style="flex:1 1 auto;min-width:0;color:var(--fgcolor-muted)">{{ f.label }}</span>
+<input type="number" value="{{ f.value }}" step="{{ f.step }}" onChange="{{ f.onSet }}" style="width:96px;height:40px;padding:0 10px;border:1px solid var(--control-bordercolor-rest,var(--bordercolor-default));border-radius:6px;background:var(--bgcolor-default);color:var(--fgcolor-default);font-family:inherit;font-size:14px">
+</label>
+</sc-for>
+</div>
+<div style="display:flex;align-items:baseline;gap:8px;margin-top:12px;padding-top:12px;border-top:1px solid var(--bordercolor-muted)">
+<span style="font-size:12px;color:var(--fgcolor-muted)">Час польоту</span>
+<span style="font-family:var(--ds-font-display);font-size:24px;line-height:32px;font-weight:600;color:var(--myfpv-3,#8dff55)">{{ b.kResult }}</span>
+</div>
+</div>
+</sc-if>
+
+<sc-if value="{{ b.isChart }}" hint-placeholder-val="{{ false }}">
+<div style="margin:12px 0;padding:12px;border:1px solid var(--bordercolor-muted);border-radius:6px">
+<div contenteditable="{{ b.editable }}" data-ph="Назва діаграми" ref="{{ b.qRef }}" onInput="{{ b.qInput }}" style="font-size:16px;line-height:24px;font-weight:600;padding-bottom:12px"></div>
+<div style="display:flex;flex-direction:column;gap:10px">
+<sc-for list="{{ b.chRows }}" as="r" hint-placeholder-count="3">
+<div style="display:flex;align-items:center;gap:10px">
+<span style="flex:0 0 96px;font-size:12px;color:var(--fgcolor-muted);overflow:hidden;text-overflow:ellipsis;white-space:nowrap">{{ r.l }}</span>
+<span style="flex:1 1 auto;height:12px;border-radius:9999px;background:var(--bgcolor-muted);overflow:hidden">
+<span style="display:block;height:100%;width:{{ r.pct }};border-radius:9999px;background:var(--myfpv-4,#64FE13);transition:width .2s cubic-bezier(.33,1,.68,1)"></span>
+</span>
+<sc-if value="{{ b.editable }}" hint-placeholder-val="{{ true }}">
+<input type="number" value="{{ r.v }}" step="0.1" onChange="{{ r.onSet }}" aria-label="Значення" style="flex:0 0 68px;height:36px;padding:0 8px;border:1px solid var(--bordercolor-default);border-radius:6px;background:var(--bgcolor-default);color:var(--fgcolor-default);font-family:inherit;font-size:13px">
+</sc-if>
+<sc-if value="{{ b.readOnly }}" hint-placeholder-val="{{ false }}">
+<span style="flex:0 0 44px;text-align:right;font-size:13px;font-weight:600">{{ r.v }}</span>
+</sc-if>
+</div>
+</sc-for>
+</div>
+<sc-if value="{{ b.editable }}" hint-placeholder-val="{{ true }}">
+<button onClick="{{ b.chAdd }}" style="margin-top:12px;display:flex;align-items:center;gap:6px;min-height:32px;padding:0 10px;border:1px solid var(--bordercolor-default);border-radius:6px;background:var(--bgcolor-muted);color:var(--fgcolor-default);font-family:inherit;font-size:12px;font-weight:600;cursor:pointer">
+<x-import component-from-global-scope="PrimerDesignSystem_285f8d.Icon" name="Plus" size="16" hint-size="16px,16px"></x-import>Рядок даних</button>
+</sc-if>
+</div>
+</sc-if>
+
+<sc-if value="{{ b.isCta }}" hint-placeholder-val="{{ false }}">
+<div style="display:flex;flex-direction:column;gap:8px;margin:12px 0;padding:16px;border:1px solid var(--myfpv-4,#64FE13);border-radius:6px;background:var(--bgcolor-muted)">
+<div contenteditable="{{ b.editable }}" data-ph="Заголовок" ref="{{ b.hRef }}" onInput="{{ b.hInput }}" style="font-size:18px;line-height:26px;font-weight:600"></div>
+<div contenteditable="{{ b.editable }}" data-ph="Опис" ref="{{ b.bRef }}" onInput="{{ b.bInput }}" style="font-size:14px;line-height:22px;color:var(--fgcolor-muted)"></div>
+<div style="display:flex;padding-top:4px">
+<span contenteditable="{{ b.editable }}" ref="{{ b.btnRef }}" onInput="{{ b.btnInput }}" style="display:inline-flex;align-items:center;min-height:40px;padding:0 16px;border-radius:6px;background:var(--myfpv-4,#64FE13);color:var(--myfpv-9,#0b1a02);font-size:14px;font-weight:600;cursor:pointer;box-shadow:var(--ds-shadow-accent-glow,0 0 0 0 transparent)"></span>
+</div>
+</div>
+</sc-if>
+
+</div>
+<sc-if value="{{ b.showKebab }}" hint-placeholder-val="{{ false }}">
+<button onClick="{{ b.ctx }}" aria-label="Дії з блоком" style="flex-shrink:0;display:flex;align-items:center;justify-content:center;width:32px;min-height:44px;border:0;background:transparent;color:var(--fgcolor-muted);cursor:pointer">
+<x-import component-from-global-scope="PrimerDesignSystem_285f8d.Icon" name="KebabHorizontal" size="16" hint-size="16px,16px"></x-import></button>
+</sc-if>
+</div>
+</sc-for>
+</div>
+
+<sc-if value="{{ isEdit }}" hint-placeholder-val="{{ true }}">
+<button onClick="{{ addAtEnd }}" style="display:flex;align-items:center;gap:8px;width:100%;min-height:48px;margin-top:8px;padding:0 8px;border:1px dashed var(--bordercolor-default);border-radius:6px;background:transparent;color:var(--fgcolor-muted);font-family:inherit;font-size:14px;cursor:pointer">
+<x-import component-from-global-scope="PrimerDesignSystem_285f8d.Icon" name="Plus" size="16" hint-size="16px,16px"></x-import>Додати блок у кінець</button>
+</sc-if>
+</div>
+</div>
+
+<sc-if value="{{ selOpen }}" hint-placeholder-val="{{ false }}">
+<div onMouseDown="{{ keepSel }}" style="position:fixed;top:{{ selTop }};left:{{ selLeft }};z-index:60;display:flex;align-items:center;gap:2px;padding:4px;border-radius:6px;background:var(--overlay-bgcolor,#12180d);border:1px solid var(--bordercolor-default);box-shadow:var(--ds-shadow-floating-small,0 0 0 1px rgba(209,217,224,.2),0 8px 16px rgba(0,0,0,.4))">
+<sc-for list="{{ fmtBtns }}" as="t" hint-placeholder-count="5">
+<button onClick="{{ t.onPick }}" aria-label="{{ t.label }}" style="display:flex;align-items:center;justify-content:center;min-width:36px;height:36px;padding:0 8px;border:0;border-radius:6px;background:transparent;color:var(--fgcolor-default);font-family:inherit;font-size:13px;font-weight:600;cursor:pointer" style-hover="background:var(--control-transparent-bgcolor-hover,rgba(129,139,152,.12))">
+<sc-if value="{{ t.hasIcon }}" hint-placeholder-val="{{ true }}">
+<x-import component-from-global-scope="PrimerDesignSystem_285f8d.Icon" name="{{ t.icon }}" size="16" hint-size="16px,16px"></x-import>
+</sc-if>
+<sc-if value="{{ t.hasText }}" hint-placeholder-val="{{ false }}">{{ t.label }}</sc-if>
+</button>
+</sc-for>
+</div>
+</sc-if>
+
+<sc-if value="{{ isEdit }}" hint-placeholder-val="{{ true }}">
+<div style="position:fixed;left:0;right:0;bottom:0;z-index:30;display:flex;align-items:stretch;gap:2px;padding:6px 6px calc(6px + env(safe-area-inset-bottom));background:var(--bgcolor-default);border-top:1px solid var(--bordercolor-muted)">
+<sc-for list="{{ barBtns }}" as="t" hint-placeholder-count="4">
+<button onClick="{{ t.onPick }}" style="flex:1 1 0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;min-height:52px;border:0;border-radius:6px;background:{{ t.bg }};color:{{ t.fg }};font-family:inherit;font-size:12px;font-weight:600;cursor:pointer">
+<x-import component-from-global-scope="PrimerDesignSystem_285f8d.Icon" name="{{ t.icon }}" size="16" hint-size="16px,16px"></x-import>{{ t.label }}</button>
+</sc-for>
+</div>
+</sc-if>
+
+<sc-if value="{{ sheetOpen }}" hint-placeholder-val="{{ false }}">
+<div onClick="{{ closeSheet }}" style="position:fixed;inset:0;z-index:50;display:flex;align-items:flex-end;justify-content:center;background:rgba(0,0,0,.55);animation:fadeIn .12s linear">
+<div onClick="{{ stop }}" style="width:100%;max-width:560px;max-height:82vh;overflow-y:auto;background:var(--bgcolor-default);border:1px solid var(--bordercolor-default);border-radius:12px 12px 0 0;padding:8px 12px calc(16px + env(safe-area-inset-bottom));animation:sheetUp .18s cubic-bezier(.33,1,.68,1)">
+<div style="display:flex;justify-content:center;padding:6px 0 10px"><span style="width:36px;height:4px;border-radius:9999px;background:var(--bordercolor-default)"></span></div>
+<div style="display:flex;align-items:center;gap:8px;padding:0 4px 8px">
+<span style="flex:1 1 auto;font-size:16px;font-weight:600">{{ sheetTitle }}</span>
+<button onClick="{{ closeSheet }}" aria-label="Закрити" style="display:flex;align-items:center;justify-content:center;width:36px;height:36px;border:0;border-radius:6px;background:var(--bgcolor-muted);color:var(--fgcolor-muted);cursor:pointer">
+<x-import component-from-global-scope="PrimerDesignSystem_285f8d.Icon" name="X" size="16" hint-size="16px,16px"></x-import></button>
+</div>
+<sc-for list="{{ sheetGroups }}" as="g" hint-placeholder-count="2">
+<div style="padding:8px 4px 4px">
+<span style="font-size:12px;font-weight:600;color:var(--fgcolor-muted)">{{ g.label }}</span>
+<div style="display:grid;grid-template-columns:{{ g.cols }};gap:6px;padding-top:6px">
+<sc-for list="{{ g.items }}" as="i" hint-placeholder-count="4">
+<button onClick="{{ i.onPick }}" style="display:flex;align-items:center;gap:10px;min-height:52px;padding:8px 10px;text-align:left;border:1px solid var(--bordercolor-muted);border-radius:6px;background:{{ i.bg }};color:var(--fgcolor-default);font-family:inherit;cursor:pointer">
+<span style="display:inline-flex;flex-shrink:0;color:{{ i.iconColor }}"><x-import component-from-global-scope="PrimerDesignSystem_285f8d.Icon" name="{{ i.icon }}" size="16" hint-size="16px,16px"></x-import></span>
+<span style="display:flex;flex-direction:column;min-width:0">
+<span style="font-size:14px;font-weight:600">{{ i.label }}</span>
+<span style="font-size:12px;color:var(--fgcolor-muted);overflow:hidden;text-overflow:ellipsis;white-space:nowrap">{{ i.desc }}</span>
+</span>
+</button>
+</sc-for>
+</div>
+</div>
+</sc-for>
+</div>
+</div>
+</sc-if>
+
+<sc-if value="{{ toastOpen }}" hint-placeholder-val="{{ false }}">
+<div style="position:fixed;left:12px;right:12px;bottom:76px;z-index:70;display:flex;align-items:center;gap:8px;max-width:420px;margin:0 auto;padding:12px;border-radius:6px;background:var(--overlay-bgcolor,#12180d);border:1px solid var(--bordercolor-default);font-size:14px;box-shadow:var(--ds-shadow-floating-small,0 8px 16px rgba(0,0,0,.4))">
+<span style="display:inline-flex;color:var(--myfpv-3,#8dff55)"><x-import component-from-global-scope="PrimerDesignSystem_285f8d.Icon" name="Check" size="16" hint-size="16px,16px"></x-import></span>{{ toast }}</div>
+</sc-if>
+</sc-if>
+</div>
+
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{&quot;startScreen&quot;:{&quot;editor&quot;:&quot;enum&quot;,&quot;options&quot;:[&quot;drafts&quot;,&quot;editor&quot;],&quot;default&quot;:&quot;drafts&quot;,&quot;tsType&quot;:&quot;'drafts'|'editor'&quot;},&quot;showOutlineRail&quot;:{&quot;editor&quot;:&quot;boolean&quot;,&quot;default&quot;:true,&quot;tsType&quot;:&quot;boolean&quot;}}">
+const TEXT_TYPES = ['p','h2','h3','list','quote','code'];
+
+const TYPE_META = {
+  p: {label:'Абзац', icon:'Typography', desc:'Звичайний текст'},
+  h2: {label:'Заголовок 2', icon:'Hash', desc:'## + пробіл'},
+  h3: {label:'Заголовок 3', icon:'Hash', desc:'### + пробіл'},
+  list: {label:'Список', icon:'ListUnordered', desc:'- + пробіл'},
+  quote: {label:'Цитата', icon:'Quote', desc:'> + пробіл'},
+  code: {label:'Код', icon:'Code', desc:'``` + пробіл'},
+  divider: {label:'Розділювач', icon:'DiffModified', desc:'Горизонтальна лінія'},
+  note: {label:'Виноска на полях', icon:'Note', desc:'Коментар автора збоку'},
+  spoiler: {label:'Розкривний блок', icon:'ChevronRight', desc:'Спойлер або FAQ'},
+  poll: {label:'Опитування', icon:'Graph', desc:'Голосування читачів'},
+  quiz: {label:'Квіз', icon:'Checklist', desc:'Питання з перевіркою'},
+  run: {label:'Код із запуском', icon:'Play', desc:'Читач виконує приклад'},
+  compare: {label:'До / після', icon:'DiffModified', desc:'Слайдер порівняння'},
+  gallery: {label:'Галерея', icon:'Image', desc:'Карусель зображень'},
+  calc: {label:'Калькулятор', icon:'Number', desc:'Поля та формула'},
+  chart: {label:'Діаграма', icon:'Graph', desc:'Стовпчики з даних'},
+  cta: {label:'Картка-CTA', icon:'Megaphone', desc:'Заклик до дії'}
+};
+
+const uid = () => 'b' + Math.random().toString(36).slice(2, 8);
+
+function mk(type, f, d) {
+  return {id: uid(), type, f: f || {}, d: d || {}};
+}
+
+function seedBlocks() {
+  return [
+    mk('p', {text:'Перший FPV-дрон збирається за вечір, якщо купити правильні деталі й не воювати з прошивкою. Нижче — маршрут, який я проходив тричі, з усіма місцями, де я гальмував.'}),
+    mk('h2', {text:'Що потрібно купити'}),
+    mk('list', {text:'<li>Рама 5" (наприклад, TBS Source One)</li><li>Стек FC + ESC 4в1, 45 А</li><li>Мотори 2207, 1750–2000 KV</li><li>VTX 5,8 ГГц і патч-антена</li><li>Акумулятор 6S 1300 мА·год</li>'}),
+    mk('note', {text:'Не купуйте набір «усе в одному» від невідомого бренду: у ньому найчастіше економлять саме на стеку, і він згорає першим.'}),
+    mk('calc', {q:'Орієнтовний час польоту'}, {cap:1300, draw:22, eff:0.8}),
+    mk('h2', {text:'Прошивка та налаштування'}),
+    mk('p', {text:'Betaflight знайде плату сам. Головне — прошити ту саму версію, для якої написані ваші PID-и, інакше значення поїдуть.'}),
+    mk('run', {}, {code:"const cells = 6;\nconst mah = 1300;\nconsole.log('Напруга:', (cells * 4.2).toFixed(1), 'В');\nconsole.log('Заряд 1C:', mah / 1000, 'A');", out:'', ran:false}),
+    mk('spoiler', {sum:'Що робити, якщо мотори крутяться не в той бік', body:'У Betaflight → Motors увімкніть реверс напрямку для потрібних моторів, або поміняйте будь-які два з трьох дротів мотора. Пропелери CW ставляться на мотори 1 і 4.'}, {open:false}),
+    mk('compare', {a:'До налаштування PID', b:'Після налаштування PID'}, {pos:52}),
+    mk('h2', {text:'Перший виліт'}),
+    mk('poll', {q:'Який режим ви вмикаєте першим?', o1:'Angle — безпечніше', o2:'Horizon — компроміс', o3:'Acro — одразу в бій'}, {v:[38,21,63], voted:0}),
+    mk('quiz', {q:'Скільки триває безпечне зберігання Li-Po у стані storage charge?', o1:'3,85 В на банку', o2:'4,20 В на банку', o3:'3,20 В на банку', why:'Storage charge — приблизно 3,80–3,85 В на банку: так хімія деградує найповільніше.'}, {answer:1, picked:0}),
+    mk('gallery', {c1:'Рама і стек перед пайкою', c2:'Прокладка дротів VTX', c3:'Готовий квадрокоптер'}, {i:0}),
+    mk('chart', {q:'Час польоту за ємністю акумулятора'}, {rows:[{l:'1000 мА·год', v:3.4},{l:'1300 мА·год', v:4.6},{l:'1500 мА·год', v:5.1}]}),
+    mk('quote', {text:'Дрон, який ви зібрали самі, ремонтується в полі за десять хвилин. Куплений — за два тижні очікування посилки.'}),
+    mk('cta', {h:'Список деталей у Google Sheets', b:'Актуальні ціни, посилання та альтернативи для кожного пункту.', btn:'Відкрити список'})
+  ];
+}
+
+const DRAFTS = [
+  {id:'d1', title:'Як зібрати перший FPV-дрон', state:'Чернетка', meta:'Змінено 12 хвилин тому · 1 240 слів', pub:false},
+  {id:'d2', title:'Betaflight 4.5: що змінилося у фільтрах', state:'На рецензії', meta:'Змінено вчора · 890 слів', pub:false},
+  {id:'d3', title:'Аналогове відео проти цифрового у 2026', state:'Опубліковано', meta:'Опубліковано 3 дні тому · 2 130 слів', pub:true},
+  {id:'d4', title:'Ремонт рами: коли карбон уже не клеїться', state:'Чернетка', meta:'Змінено 5 днів тому · 410 слів', pub:false}
+];
+
+class Component extends DCLogic {
+  state = {
+    screen: this.props.startScreen || 'drafts',
+    mode: 'edit',
+    filter: 'Усі',
+    title: 'Як зібрати перший FPV-дрон',
+    blocks: seedBlocks(),
+    sheet: null,
+    ctxId: null,
+    activeId: null,
+    sel: null,
+    toast: null,
+    saving: false,
+    w: typeof window === 'undefined' ? 420 : window.innerWidth
+  };
+
+  els = {};
+
+  componentDidMount() {
+    document.documentElement.setAttribute('data-theme', 'dark');
+    document.documentElement.classList.add('dark');
+    this.onResize = () => this.setState({w: window.innerWidth});
+    window.addEventListener('resize', this.onResize);
+    this.onSelChange = () => this.checkSelection();
+    document.addEventListener('selectionchange', this.onSelChange);
+  }
+
+  componentWillUnmount() {
+    window.removeEventListener('resize', this.onResize);
+    document.removeEventListener('selectionchange', this.onSelChange);
+    clearTimeout(this.holdT); clearTimeout(this.saveT); clearTimeout(this.toastT);
+  }
+
+  /* ---------- editable plumbing ---------- */
+
+  ce(b, field, store) {
+    const s = store || b.f;
+    const key = b.id + ':' + field;
+    return {
+      ref: el => {
+        if (!el) return;
+        this.els[key] = el;
+        if (el.dataset.ce !== key) {
+          el.dataset.ce = key;
+          el.innerHTML = s[field] || '';
+        }
+      },
+      input: e => { s[field] = e.currentTarget.innerHTML; this.touch(); }
+    };
+  }
+
+  find(id) { return this.state.blocks.find(b => b.id === id); }
+  idx(id) { return this.state.blocks.findIndex(b => b.id === id); }
+
+  touch() {
+    this.setState({saving: true});
+    clearTimeout(this.saveT);
+    this.saveT = setTimeout(() => this.setState({saving: false}), 900);
+  }
+
+  flash(msg) {
+    this.setState({toast: msg});
+    clearTimeout(this.toastT);
+    this.toastT = setTimeout(() => this.setState({toast: null}), 2400);
+  }
+
+  strip(html) { return String(html || '').replace(/<[^>]*>/g, ' ').replace(/&nbsp;/g, ' '); }
+
+  words() {
+    let t = this.strip(this.state.title);
+    this.state.blocks.forEach(b => Object.values(b.f).forEach(v => { t += ' ' + this.strip(v); }));
+    return t.trim().split(/\s+/).filter(Boolean).length;
+  }
+
+  focusEnd(id, field) {
+    const key = id + ':' + (field || 'text');
+    requestAnimationFrame(() => {
+      const el = this.els[key];
+      if (!el) return;
+      el.focus();
+      const r = document.createRange();
+      r.selectNodeContents(el); r.collapse(false);
+      const s = getSelection(); s.removeAllRanges(); s.addRange(r);
+    });
+  }
+
+  /* ---------- block operations ---------- */
+
+  insert(type, atId, replace) {
+    const blocks = this.state.blocks.slice();
+    const nb = this.blank(type);
+    if (replace && atId) {
+      blocks.splice(this.idx(atId), 1, nb);
+    } else if (atId) {
+      blocks.splice(this.idx(atId) + 1, 0, nb);
+    } else {
+      blocks.push(nb);
+    }
+    this.setState({blocks, sheet: null, activeId: nb.id});
+    if (TEXT_TYPES.indexOf(type) >= 0) this.focusEnd(nb.id);
+  }
+
+  blank(type) {
+    if (type === 'list') return mk('list', {text:'<li>Новий пункт</li>'});
+    if (type === 'poll') return mk('poll', {q:'Ваше питання', o1:'Варіант 1', o2:'Варіант 2', o3:'Варіант 3'}, {v:[0,0,0], voted:0});
+    if (type === 'quiz') return mk('quiz', {q:'Питання', o1:'Правильна відповідь', o2:'Варіант 2', o3:'Варіант 3', why:'Чому саме так.'}, {answer:1, picked:0});
+    if (type === 'spoiler') return mk('spoiler', {sum:'Що приховано', body:'Розкритий текст.'}, {open:false});
+    if (type === 'run') return mk('run', {}, {code:"console.log('Привіт!');", out:'', ran:false});
+    if (type === 'compare') return mk('compare', {a:'До', b:'Після'}, {pos:50});
+    if (type === 'gallery') return mk('gallery', {c1:'Підпис 1', c2:'Підпис 2', c3:'Підпис 3'}, {i:0});
+    if (type === 'calc') return mk('calc', {q:'Розрахунок'}, {cap:1300, draw:22, eff:0.8});
+    if (type === 'chart') return mk('chart', {q:'Назва діаграми'}, {rows:[{l:'A', v:3},{l:'Б', v:5},{l:'В', v:2}]});
+    if (type === 'cta') return mk('cta', {h:'Заголовок картки', b:'Один рядок про те, що там.', btn:'Перейти'});
+    if (type === 'note') return mk('note', {text:'Коротка ремарка на полях.'});
+    if (type === 'divider') return mk('divider', {});
+    return mk(type, {text:''});
+  }
+
+  convert(id, type) {
+    const b = this.find(id);
+    if (!b) return;
+    const text = this.strip(b.f.text).trim();
+    const blocks = this.state.blocks.slice();
+    const nb = this.blank(type);
+    if (TEXT_TYPES.indexOf(type) >= 0) nb.f.text = type === 'list' ? '<li>' + text + '</li>' : text;
+    blocks.splice(this.idx(id), 1, nb);
+    this.setState({blocks, sheet: null, ctxId: null, activeId: nb.id});
+    if (TEXT_TYPES.indexOf(type) >= 0) this.focusEnd(nb.id);
+  }
+
+  move(id, dir) {
+    const i = this.idx(id), j = i + dir;
+    if (j < 0 || j >= this.state.blocks.length) return;
+    const blocks = this.state.blocks.slice();
+    blocks.splice(j, 0, blocks.splice(i, 1)[0]);
+    this.setState({blocks, sheet: null, ctxId: null});
+  }
+
+  dup(id) {
+    const b = this.find(id);
+    const blocks = this.state.blocks.slice();
+    blocks.splice(this.idx(id) + 1, 0, {id: uid(), type: b.type, f: Object.assign({}, b.f), d: JSON.parse(JSON.stringify(b.d))});
+    this.setState({blocks, sheet: null, ctxId: null});
+  }
+
+  del(id) {
+    const i = this.idx(id);
+    const blocks = this.state.blocks.filter(b => b.id !== id);
+    this.setState({blocks, sheet: null, ctxId: null});
+    const prev = blocks[Math.max(0, i - 1)];
+    if (prev && TEXT_TYPES.indexOf(prev.type) >= 0) this.focusEnd(prev.id);
+  }
+
+  /* ---------- keyboard + markdown ---------- */
+
+  onInput(b, e) {
+    const el = e.currentTarget;
+    b.f.text = el.innerHTML;
+    this.touch();
+    if (b.type !== 'p') return;
+    const t = el.textContent || '';
+    if (t === '/') { this.setState({sheet: 'insert', ctxId: b.id, slash: true}); return; }
+    const rules = [[/^###\s/, 'h3'], [/^##\s/, 'h2'], [/^[-*]\s/, 'list'], [/^>\s/, 'quote'], [/^```\s?/, 'code'], [/^---$/, 'divider']];
+    for (const [re, type] of rules) {
+      if (re.test(t)) {
+        b.f.text = t.replace(re, '');
+        this.convert(b.id, type);
+        return;
+      }
+    }
+  }
+
+  onKey(b, e) {
+    if (e.key === 'Enter' && !e.shiftKey && b.type !== 'code' && b.type !== 'list') {
+      e.preventDefault();
+      this.insert('p', b.id);
+    } else if (e.key === 'Backspace' && !(e.currentTarget.textContent || '').trim() && this.state.blocks.length > 1) {
+      e.preventDefault();
+      this.del(b.id);
+    }
+  }
+
+  /* ---------- selection toolbar ---------- */
+
+  checkSelection() {
+    if (this.state.mode !== 'edit' || this.state.screen !== 'editor') return;
+    const s = getSelection();
+    if (!s || s.rangeCount === 0 || s.isCollapsed) { if (this.state.sel) this.setState({sel: null}); return; }
+    const n = s.anchorNode;
+    const host = n && (n.nodeType === 1 ? n : n.parentElement);
+    const el = host && host.closest ? host.closest('[data-ce]') : null;
+    if (!el) { if (this.state.sel) this.setState({sel: null}); return; }
+    this.selEl = el;
+    const r = s.getRangeAt(0).getBoundingClientRect();
+    const width = 250;
+    this.setState({sel: {
+      top: Math.max(8, r.top - 48),
+      left: Math.max(8, Math.min(r.left + r.width / 2 - width / 2, window.innerWidth - width - 8))
+    }});
+  }
+
+  fmt(kind) {
+    const el = this.selEl;
+    if (!el) return;
+    if (kind === 'code') {
+      const s = getSelection();
+      const txt = s.toString();
+      document.execCommand('insertHTML', false, '<code style="font-family:var(--ds-font-mono);font-size:13px;padding:1px 4px;border-radius:6px;background:var(--bgcolor-muted)">' + txt + '</code>');
+    } else if (kind === 'link') {
+      document.execCommand('createLink', false, 'https://');
+    } else {
+      document.execCommand(kind);
+    }
+    const key = el.dataset.ce.split(':');
+    if (key[0] === 'title') { this.state.title = el.innerHTML; }
+    const b = this.find(key[0]);
+    if (b) { const store = key[1] in b.f ? b.f : b.d; store[key[1]] = el.innerHTML; }
+    this.touch();
+    this.setState({sel: null});
+  }
+
+  /* ---------- sheets ---------- */
+
+  openCtx(id) { this.setState({sheet: 'ctx', ctxId: id, activeId: id}); }
+
+  insertGroups() {
+    const g = (label, types, cols) => ({
+      label, cols,
+      items: types.map(t => ({
+        label: TYPE_META[t].label, desc: TYPE_META[t].desc, icon: TYPE_META[t].icon,
+        bg: 'transparent', iconColor: 'var(--fgcolor-muted)',
+        onPick: () => this.insert(t, this.state.ctxId, this.state.slash)
+      }))
+    });
+    const cols = this.state.w >= 720 ? '1fr 1fr' : '1fr';
+    return [
+      g('Текст і розмітка', ['p','h2','h3','list','quote','code','divider','note'], cols),
+      g('Інтерактивні компоненти', ['poll','quiz','spoiler','compare','run','gallery','calc','chart','cta'], cols)
+    ];
+  }
+
+  ctxGroups() {
+    const id = this.state.ctxId;
+    const b = this.find(id);
+    const acts = [
+      {label:'Підняти вище', desc:'Помістити перед попереднім', icon:'ChevronUp', onPick: () => this.move(id, -1)},
+      {label:'Опустити нижче', desc:'Помістити після наступного', icon:'ChevronDown', onPick: () => this.move(id, 1)},
+      {label:'Дублювати', desc:'Копія одразу під блоком', icon:'Copy', onPick: () => this.dup(id)},
+      {label:'Вставити блок після', desc:'Відкрити каталог блоків', icon:'Plus', onPick: () => this.setState({sheet:'insert', slash:false})},
+      {label:'Видалити', desc:'Прибрати блок зі статті', icon:'Trash', onPick: () => this.del(id)}
+    ].map(a => Object.assign({bg:'transparent', iconColor:'var(--fgcolor-muted)'}, a));
+    const groups = [{label: b ? TYPE_META[b.type].label : 'Блок', cols:'1fr', items: acts}];
+    if (b && TEXT_TYPES.indexOf(b.type) >= 0) {
+      groups.push({
+        label: 'Перетворити на', cols: this.state.w >= 720 ? '1fr 1fr' : '1fr',
+        items: TEXT_TYPES.filter(t => t !== b.type).map(t => ({
+          label: TYPE_META[t].label, desc: TYPE_META[t].desc, icon: TYPE_META[t].icon,
+          bg:'transparent', iconColor:'var(--fgcolor-muted)',
+          onPick: () => this.convert(id, t)
+        }))
+      });
+    }
+    return groups;
+  }
+
+  outlineGroups() {
+    const items = this.state.blocks.filter(b => b.type === 'h2' || b.type === 'h3').map(b => ({
+      label: this.strip(b.f.text).trim() || 'Без назви',
+      desc: b.type === 'h2' ? 'Розділ' : 'Підрозділ',
+      icon: 'Hash', bg:'transparent', iconColor:'var(--fgcolor-muted)',
+      onPick: () => { this.setState({sheet: null}); this.jump(b.id); }
+    }));
+    return [{label: this.statsLine(), cols:'1fr', items}];
+  }
+
+  jump(id) {
+    requestAnimationFrame(() => {
+      const el = this.els[id + ':text'];
+      if (el) window.scrollTo({top: el.getBoundingClientRect().top + window.scrollY - 84, behavior: 'smooth'});
+    });
+  }
+
+  statsLine() {
+    const w = this.words();
+    return w + ' слів · ' + Math.max(1, Math.round(w / 180)) + ' хв читання · ' + this.state.blocks.length + ' блоків';
+  }
+
+  /* ---------- view ---------- */
+
+  blockVals() {
+    const edit = this.state.mode === 'edit';
+    return this.state.blocks.map(b => {
+      const t = this.ce(b, 'text');
+      const vm = {
+        id: b.id, type: b.type, editable: edit,
+        ref: t.ref, input: e => this.onInput(b, e), key: e => this.onKey(b, e),
+        editing: edit, showKebab: edit,
+        hl: this.state.ctxId === b.id && this.state.sheet === 'ctx' ? 'var(--bgcolor-muted)' : 'transparent',
+        ctx: e => { if (e && e.preventDefault) e.preventDefault(); this.openCtx(b.id); },
+        holdStart: () => { clearTimeout(this.holdT); this.holdT = setTimeout(() => this.openCtx(b.id), 450); },
+        holdEnd: () => clearTimeout(this.holdT)
+      };
+      ['p','h2','h3','list','quote','code','divider','note','spoiler','poll','quiz','run','compare','gallery','calc','chart','cta'].forEach(k => {
+        vm['is' + k.charAt(0).toUpperCase() + k.slice(1)] = b.type === k;
+      });
+      this.decorate(vm, b, edit);
+      return vm;
+    });
+  }
+
+  decorate(vm, b, edit) {
+    const F = f => this.ce(b, f);
+    const D = f => this.ce(b, f, b.d);
+    const bump = () => { this.touch(); this.forceUpdate(); };
+    vm.readOnly = !edit;
+
+    if (b.type === 'spoiler') {
+      const s = F('sum'), y = F('body');
+      vm.sumRef = s.ref; vm.sumInput = s.input;
+      vm.bodyRef = y.ref; vm.bodyInput = y.input;
+      vm.sOpen = !!b.d.open || edit;
+      vm.sIcon = vm.sOpen ? 'ChevronDown' : 'ChevronRight';
+      vm.sToggle = () => { b.d.open = !b.d.open; this.forceUpdate(); };
+    }
+
+    if (b.type === 'poll' || b.type === 'quiz' || b.type === 'calc' || b.type === 'chart') {
+      const q = F('q');
+      vm.qRef = q.ref; vm.qInput = q.input;
+    }
+
+    if (b.type === 'poll') {
+      const total = b.d.v.reduce((a, c) => a + c, 0) || 1;
+      vm.pOpts = [1, 2, 3].map(n => {
+        const o = F('o' + n);
+        const votes = b.d.v[n - 1];
+        const pct = Math.round(votes / total * 100);
+        const mine = b.d.voted === n;
+        return {
+          ref: o.ref, input: o.input,
+          pct: (b.d.voted ? pct : 0) + '%',
+          fill: mine ? 'var(--myfpv-4,#64FE13)' : 'var(--bgcolor-muted)',
+          border: mine ? 'var(--myfpv-4,#64FE13)' : 'var(--bordercolor-default)',
+          weight: mine ? '600' : '400',
+          label: b.d.voted ? pct + '%' : '',
+          onVote: () => {
+            if (b.d.voted === n) return;
+            if (b.d.voted) b.d.v[b.d.voted - 1] -= 1;
+            b.d.v[n - 1] += 1; b.d.voted = n;
+            this.forceUpdate();
+          }
+        };
+      });
+      vm.pTotal = b.d.voted ? (b.d.v.reduce((a, c) => a + c, 0)) + ' голосів · ваш голос врахований' : 'Натисніть варіант, щоб проголосувати';
+    }
+
+    if (b.type === 'quiz') {
+      const w = F('why');
+      vm.whyRef = w.ref; vm.whyInput = w.input;
+      vm.qzShowWhy = !!b.d.picked || edit;
+      vm.qzCanReset = !!b.d.picked;
+      vm.qzHint = edit ? ' · правильна відповідь позначена галочкою' : '';
+      vm.qzReset = () => { b.d.picked = 0; this.forceUpdate(); };
+      vm.qzOpts = [1, 2, 3].map(n => {
+        const o = F('o' + n);
+        const right = b.d.answer === n;
+        const picked = b.d.picked === n;
+        const show = (edit && right) || (picked) || (b.d.picked && right);
+        return {
+          ref: o.ref, input: o.input,
+          bg: picked ? (right ? 'var(--bgcolor-muted)' : 'var(--bgcolor-muted)') : 'transparent',
+          border: (b.d.picked && right) || (edit && right) ? 'var(--myfpv-4,#64FE13)'
+            : picked ? 'var(--bordercolor-danger-emphasis,#d1444e)' : 'var(--bordercolor-default)',
+          showMark: !!show,
+          mark: right ? 'CheckCircle' : 'CircleXFill',
+          markColor: right ? 'var(--myfpv-3,#8dff55)' : 'var(--fgcolor-danger,#e5808a)',
+          onPick: () => {
+            if (edit) { b.d.answer = n; bump(); return; }
+            b.d.picked = n; this.forceUpdate();
+          }
+        };
+      });
+    }
+
+    if (b.type === 'run') {
+      const c = D('code');
+      vm.rRef = c.ref; vm.rInput = c.input;
+      vm.rRan = !!b.d.ran;
+      vm.rOut = b.d.out;
+      vm.rColor = b.d.err ? 'var(--fgcolor-danger,#e5808a)' : 'var(--myfpv-3,#8dff55)';
+      vm.rRun = () => {
+        const lines = [];
+        const fake = {log: (...a) => lines.push(a.map(x => typeof x === 'object' ? JSON.stringify(x) : String(x)).join(' '))};
+        try {
+          new Function('console', b.d.code)(fake);
+          b.d.err = false;
+          b.d.out = lines.join('\n') || '(без виводу)';
+        } catch (err) {
+          b.d.err = true;
+          b.d.out = String(err);
+        }
+        b.d.ran = true;
+        this.forceUpdate();
+      };
+    }
+
+    if (b.type === 'compare') {
+      const a = F('a'), z = F('b');
+      vm.caRef = a.ref; vm.caInput = a.input;
+      vm.cbRef = z.ref; vm.cbInput = z.input;
+      vm.cPos = b.d.pos;
+      vm.cPct = b.d.pos + '%';
+      vm.cWidth = Math.round(10000 / Math.max(4, b.d.pos)) + '%';
+      vm.cSet = e => { b.d.pos = Number(e.currentTarget.value); this.forceUpdate(); };
+    }
+
+    if (b.type === 'gallery') {
+      const cap = F('c' + (b.d.i + 1));
+      vm.gRef = cap.ref; vm.gInput = cap.input;
+      vm.gSlot = 'Зображення ' + (b.d.i + 1) + ' з 3 — перетягніть файл';
+      vm.gDots = [0, 1, 2].map(n => ({bg: n === b.d.i ? 'var(--myfpv-4,#64FE13)' : 'var(--bordercolor-default)'}));
+      vm.gPrev = () => { b.d.i = (b.d.i + 2) % 3; this.forceUpdate(); };
+      vm.gNext = () => { b.d.i = (b.d.i + 1) % 3; this.forceUpdate(); };
+    }
+
+    if (b.type === 'calc') {
+      vm.kFields = [
+        {label:'Ємність акумулятора, мА·год', key:'cap', step:'50'},
+        {label:'Середній струм, А', key:'draw', step:'0.5'},
+        {label:'Використання ємності (0–1)', key:'eff', step:'0.05'}
+      ].map(f => ({
+        label: f.label, value: b.d[f.key], step: f.step,
+        onSet: e => { b.d[f.key] = Number(e.currentTarget.value); bump(); }
+      }));
+      const mins = (b.d.cap / 1000) * b.d.eff / Math.max(0.1, b.d.draw) * 60;
+      vm.kResult = mins.toFixed(1) + ' хв';
+    }
+
+    if (b.type === 'chart') {
+      const max = Math.max.apply(null, b.d.rows.map(r => r.v).concat([1]));
+      vm.chRows = b.d.rows.map((r, i) => ({
+        l: r.l, v: r.v, pct: Math.round(r.v / max * 100) + '%',
+        onSet: e => { b.d.rows[i].v = Number(e.currentTarget.value); bump(); }
+      }));
+      vm.chAdd = () => { b.d.rows.push({l:'Новий рядок', v: 1}); bump(); };
+    }
+
+    if (b.type === 'cta') {
+      const h = F('h'), y = F('b'), t = F('btn');
+      vm.hRef = h.ref; vm.hInput = h.input;
+      vm.bRef = y.ref; vm.bInput = y.input;
+      vm.btnRef = t.ref; vm.btnInput = t.input;
+    }
+  }
+
+  renderVals() {
+    const st = this.state;
+    const edit = st.mode === 'edit';
+    const sheetTitles = {insert: st.slash ? 'Вставити замість «/»' : 'Вставити блок', ctx: 'Дії з блоком', outline: 'Структура статті'};
+    const sheetGroups = st.sheet === 'insert' ? this.insertGroups() : st.sheet === 'ctx' ? this.ctxGroups() : st.sheet === 'outline' ? this.outlineGroups() : [];
+
+    return {
+      isDrafts: st.screen === 'drafts',
+      isEditor: st.screen === 'editor',
+      isEdit: edit,
+      showRail: st.w >= 1012 && (this.props.showOutlineRail !== false),
+      docLabel: this.strip(st.title).trim() || 'Без назви',
+      saveLabel: st.saving ? 'Збереження…' : 'Усі зміни збережено',
+      modeLabel: edit ? 'Прев’ю' : 'Редагувати',
+      statsLine: this.statsLine(),
+
+      filters: ['Усі','Чернетки','На рецензії','Опубліковані'].map(f => ({
+        label: f,
+        bg: st.filter === f ? 'var(--bgcolor-muted)' : 'transparent',
+        fg: st.filter === f ? 'var(--fgcolor-default)' : 'var(--fgcolor-muted)',
+        onPick: () => this.setState({filter: f})
+      })),
+      drafts: DRAFTS.filter(d => st.filter === 'Усі'
+        || (st.filter === 'Опубліковані' && d.pub)
+        || (st.filter === 'Чернетки' && d.state === 'Чернетка')
+        || (st.filter === 'На рецензії' && d.state === 'На рецензії')
+      ).map(d => ({
+        title: d.title, state: d.state, meta: d.meta,
+        onOpen: () => this.setState({screen: 'editor', title: d.title})
+      })),
+      newDraft: () => this.setState({screen: 'editor', title: '', blocks: [this.blank('p')]}),
+      goDrafts: () => this.setState({screen: 'drafts', sel: null, sheet: null}),
+      toggleMode: () => this.setState({mode: edit ? 'read' : 'edit', sel: null, sheet: null}),
+      publish: () => this.flash('Статтю поставлено в чергу на публікацію'),
+
+      titleRef: el => {
+        if (!el) return;
+        this.els['title'] = el;
+        el.dataset.ce = 'title:title';
+        if (el.dataset.ceInit !== '1') { el.innerHTML = st.title; el.dataset.ceInit = '1'; }
+      },
+      titleInput: e => { this.state.title = e.currentTarget.innerHTML; this.touch(); },
+
+      blocks: this.blockVals(),
+      addAtEnd: () => this.setState({sheet: 'insert', ctxId: null, slash: false}),
+
+      outline: st.blocks.filter(b => b.type === 'h2' || b.type === 'h3').map(b => ({
+        label: this.strip(b.f.text).trim() || 'Без назви',
+        indent: b.type === 'h3' ? '20px' : '8px',
+        mark: b.type === 'h2' ? 'var(--bordercolor-default)' : 'transparent',
+        onGo: () => this.jump(b.id)
+      })),
+
+      selOpen: !!st.sel && edit,
+      selTop: st.sel ? st.sel.top + 'px' : '0px',
+      selLeft: st.sel ? st.sel.left + 'px' : '0px',
+      keepSel: e => e.preventDefault(),
+      fmtBtns: [
+        {label:'Жирний', icon:'Bold', hasIcon:true, hasText:false, onPick: () => this.fmt('bold')},
+        {label:'Курсив', icon:'Italic', hasIcon:true, hasText:false, onPick: () => this.fmt('italic')},
+        {label:'Код', icon:'Code', hasIcon:true, hasText:false, onPick: () => this.fmt('code')},
+        {label:'Посилання', icon:'LinkExternal', hasIcon:true, hasText:false, onPick: () => this.fmt('link')},
+        {label:'Виноска', icon:'Note', hasIcon:false, hasText:true, onPick: () => this.fmt('underline')}
+      ],
+
+      barBtns: [
+        {label:'Вставити', icon:'Plus', bg:'var(--myfpv-4,#64FE13)', fg:'var(--myfpv-9,#0b1a02)', onPick: () => this.setState({sheet:'insert', ctxId: this.state.activeId, slash:false})},
+        {label:'Структура', icon:'ListUnordered', bg:'transparent', fg:'var(--fgcolor-default)', onPick: () => this.setState({sheet:'outline'})},
+        {label:'Блок', icon:'KebabHorizontal', bg:'transparent', fg:'var(--fgcolor-default)', onPick: () => this.openCtx(this.state.activeId || this.state.blocks[0].id)},
+        {label:'Прев’ю', icon:'Book', bg:'transparent', fg:'var(--fgcolor-default)', onPick: () => this.setState({mode:'read', sel:null})}
+      ],
+
+      sheetOpen: !!st.sheet,
+      sheetTitle: sheetTitles[st.sheet] || '',
+      sheetGroups,
+      closeSheet: () => this.setState({sheet: null}),
+      stop: e => e.stopPropagation(),
+
+      toastOpen: !!st.toast,
+      toast: st.toast || ''
+    };
+  }
+}
+
+</script>
+</body>
+</html>

@@ -1,0 +1,14 @@
+/* Avatars. Circular by default (square=false is the source default);
+   1px translucent border, 2px white ring when stacked. */
+.ds-avatar{display:inline-block;flex-shrink:0;background-color:var(--avatar-bgcolor);background-size:cover;background-position:center;border:var(--ds-borderwidth-thin) solid var(--avatar-bordercolor);border-radius:var(--ds-radius-full);object-fit:cover;overflow:hidden}
+.ds-avatar--square{border-radius:var(--ds-radius-medium)}
+.ds-avatar--square-small{border-radius:var(--ds-radius-small)}
+.ds-avatarpair{position:relative;display:inline-block}
+.ds-avatarpair__child{position:absolute;right:-4px;bottom:-4px;box-shadow:var(--ds-shadow-avatar)}
+.ds-avatarstack{display:inline-flex;align-items:center;position:relative}
+.ds-avatarstack>.ds-avatar{box-shadow:var(--ds-shadow-avatar);margin-left:-4px}
+.ds-avatarstack>.ds-avatar:first-child{margin-left:0}
+.ds-avatarstack--right{flex-direction:row-reverse}
+.ds-avatarstack--right>.ds-avatar{margin-left:0;margin-right:-4px}
+.ds-avatarstack--right>.ds-avatar:first-child{margin-right:0}
+.ds-avatarstack__more{display:inline-flex;align-items:center;margin-left:var(--ds-space-medium);font-family:var(--ds-font-sans);font-size:var(--ds-text-body-small-size);color:var(--fgcolor-muted)}

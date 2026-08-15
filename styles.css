@@ -1,0 +1,19 @@
+/* myFPV Design System — global CSS entry point.
+   Consumers link this one file. Imports only; no rules here.
+
+   Order matters: fig-tokens.css is the raw record of the source Figma file, and
+   palette.css + color.css are the myFPV colour system that replaces its colour
+   roles. color.css loads after the component CSS because it carries the two
+   accent rules that component styles must not win over.
+
+   fonts.css is first so the @font-face rules are declared before anything asks
+   for the family. */
+@import './tokens/fonts.css';
+@import './tokens/fig-tokens.css';
+@import './tokens/fig-typography.css';
+@import './tokens/scale.css';
+@import './tokens/typography.css';
+@import './tokens/palette.css';
+@import './tokens/base.css';
+@import './components/components.css';
+@import './tokens/color.css';
